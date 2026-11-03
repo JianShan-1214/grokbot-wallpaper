@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <script>
@@ -10,22 +10,22 @@ toOffice();
 addEventListener('hashchange', toOffice);                  // the link pasted into a tab that already shows this page
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Grok Bot Wallpaper</title>
-<meta name="description" content="A wallpaper that looks back. Grok Bot follows your cursor and blinks, under a sky that moves with the real sun. Free for Windows and Mac.">
+<title>Grok Bot 桌布</title>
+<meta name="description" content="會看向你的桌布。Grok Bot 跟著游標移動、會眨眼，天空跟著真實的太陽走。Windows 與 Mac 皆可免費使用。">
 <meta name="theme-color" content="#FFFFFF">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://0xcodila.com/grokbot-wallpaper/">
 <meta property="og:url" content="https://0xcodila.com/grokbot-wallpaper/">
-<meta property="og:site_name" content="Grok Bot Wallpaper">
-<meta property="og:title" content="Grok Bot Wallpaper">
-<meta property="og:description" content="A wallpaper that looks back. Free for Windows and Mac.">
+<meta property="og:site_name" content="Grok Bot 桌布">
+<meta property="og:title" content="Grok Bot 桌布">
+<meta property="og:description" content="會看向你的桌布。Windows 與 Mac 皆可免費使用。">
 <meta property="og:image" content="https://0xcodila.com/grokbot-wallpaper/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Grok Bot, a big glossy white ball with two eyes, rising under an open sky">
+<meta property="og:image:alt" content="Grok Bot：一顆有兩隻眼睛的亮面白球，在開闊的天空下升起">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Grok Bot Wallpaper">
-<meta name="twitter:description" content="A wallpaper that looks back. Free for Windows and Mac.">
+<meta name="twitter:title" content="Grok Bot 桌布">
+<meta name="twitter:description" content="會看向你的桌布。Windows 與 Mac 皆可免費使用。">
 <meta name="twitter:image" content="https://0xcodila.com/grokbot-wallpaper/og.png">
 <link rel="icon" href="assets/brand/logo-mark.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/brand/logo-mark.png">
@@ -48,7 +48,7 @@ addEventListener('hashchange', toOffice);                  // the link pasted in
   --edge: clamp(8px, 1vw, 14px); --radius: clamp(20px, 2.2vw, 32px); --pad: clamp(22px, 2.6vw, 40px);
   --gap: 14px; --tile-r: 22px; --tile-pad: 28px;
   --ease-out: cubic-bezier(.23, 1, .32, 1); --ease-in-out: cubic-bezier(.77, 0, .175, 1);
-  font-family: 'Host Grotesk Variable', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family: 'Host Grotesk Variable', -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei", "WenQuanYi Micro Hei", "Droid Sans Fallback", system-ui, sans-serif;
   color-scheme: light;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -292,91 +292,91 @@ footer .links { display: flex; flex-wrap: wrap; gap: 6px 24px; }
 <header class="hero">
   <div class="stage">
     <!-- the real wallpaper, always its current version; the script puts its bot cards away (data-clean) -->
-    <iframe id="live" src="face/" title="Grok Bot Wallpaper, running live" data-clean></iframe>
+    <iframe id="live" src="face/" title="正在運行的 Grok Bot 桌布" data-clean></iframe>
   </div>
   <div class="stage__bar">
-    <span class="brand"><img class="mark" src="assets/brand/logo-mark.png" width="28" height="28" alt="">Grok Bot Wallpaper</span>
-    <nav class="stage__links" aria-label="On this page"><a href="#dashboard">Dashboard</a><a href="#film">Watch</a><a href="#install">Install</a><a href="face/" data-fullscreen>Full screen</a></nav>
+    <span class="brand"><img class="mark" src="assets/brand/logo-mark.png" width="28" height="28" alt="">Grok Bot 桌布</span>
+    <nav class="stage__links" aria-label="本頁導覽"><a href="#dashboard">儀表板</a><a href="#film">觀看</a><a href="#install">安裝</a><a href="face/" data-fullscreen>全螢幕</a></nav>
   </div>
   <div class="stage__title">
-    <h1>Grok Bot’s first wallpaper + dashboard</h1>
-    <p>Grok Bot follows your cursor and blinks, under a sky that moves with the real sun. Free for Windows and Mac.</p>
-    <div class="pick" role="radiogroup" aria-label="Grok Bot colour" data-bot="white">
-      <button type="button" role="radio" aria-checked="true" data-pick="white"><i class="sw sw--white"></i>White</button>
-      <button type="button" role="radio" aria-checked="false" data-pick="black"><i class="sw sw--black"></i>Black</button>
+    <h1>Grok Bot 的第一款桌布與儀表板</h1>
+    <p>Grok Bot 跟著游標移動、會眨眼，天空跟著真實的太陽走。Windows 與 Mac 皆可免費使用。</p>
+    <div class="pick" role="radiogroup" aria-label="Grok Bot 顏色" data-bot="white">
+      <button type="button" role="radio" aria-checked="true" data-pick="white"><i class="sw sw--white"></i>白色</button>
+      <button type="button" role="radio" aria-checked="false" data-pick="black"><i class="sw sw--black"></i>黑色</button>
       <span class="pick__thumb" aria-hidden="true"></span>
     </div>
   </div>
-  <div class="when" role="radiogroup" aria-label="Time of day">
-    <button type="button" role="radio" aria-checked="false" data-when="morning">Morning</button>
-    <button type="button" role="radio" aria-checked="false" data-when="day">Day</button>
-    <button type="button" role="radio" aria-checked="false" data-when="sunset">Sunset</button>
-    <button type="button" role="radio" aria-checked="false" data-when="night">Night</button>
+  <div class="when" role="radiogroup" aria-label="時段">
+    <button type="button" role="radio" aria-checked="false" data-when="morning">早晨</button>
+    <button type="button" role="radio" aria-checked="false" data-when="day">白天</button>
+    <button type="button" role="radio" aria-checked="false" data-when="sunset">日落</button>
+    <button type="button" role="radio" aria-checked="false" data-when="night">夜晚</button>
     <span class="when__thumb" aria-hidden="true"></span>
   </div>
   <div class="stage__actions">
-    <a class="btn btn--big btn--ink" data-os="windows" href="download/grokbot-wallpaper-windows.zip" download>Download for Windows <small>for Lively Wallpaper (free)</small></a>
-    <a class="btn btn--big btn--white" data-os="mac" href="https://github.com/Bodila51/grokbot-wallpaper/releases/latest/download/GrokBotWallpaper.dmg">Download for Mac <small>macOS 13 or later</small></a>
+    <a class="btn btn--big btn--ink" data-os="windows" href="download/grokbot-wallpaper-windows.zip" download>下載 Windows 版 <small>給 Lively Wallpaper（免費）</small></a>
+    <a class="btn btn--big btn--white" data-os="mac" href="https://github.com/Bodila51/grokbot-wallpaper/releases/latest/download/GrokBotWallpaper.dmg">下載 Mac 版 <small>macOS 13 或更新版本</small></a>
   </div>
 </header>
 
   <section class="board" id="dashboard" aria-labelledby="board-title">
-    <div class="head rise"><h2 id="board-title">A dashboard for your bots, on your desktop.</h2><p>Live cards show which bots work, which wait for you and which hit an error. Drag them anywhere.</p></div>
+    <div class="head rise"><h2 id="board-title">放在桌面上的機器人儀表板。</h2><p>即時卡片顯示哪些機器人在工作、哪些在等你、哪些出錯。卡片可以拖到任何地方。</p></div>
     <figure class="board__frame rise" style="--i:1">
-      <iframe id="board" src="face/?demo=1" title="Grok Bot Wallpaper with its live bot cards (sample bots)" loading="lazy"></iframe>
+      <iframe id="board" src="face/?demo=1" title="Grok Bot 桌布與即時機器人卡片（範例機器人）" loading="lazy"></iframe>
     </figure>
     <div class="board__connect rise" style="--i:2">
-      <button class="btn btn--ink" type="button" id="copy-prompt">Copy the setup prompt</button>
-      <p><b>Show your own bots.</b> Paste the prompt into Grok Bot. It connects all your bots and replies with your wallpaper link: paste that into Lively, or into the Mac app’s Bots channel.</p>
+      <button class="btn btn--ink" type="button" id="copy-prompt">複製設定提示</button>
+      <p><b>顯示你自己的機器人。</b> 把提示貼進 Grok Bot。它會接上你所有的機器人，並回傳桌布連結：貼到 Lively，或貼到 Mac app 的機器人頻道。</p>
     </div>
   </section>
 
 <main>
   <section class="film" id="film" aria-labelledby="film-title">
-    <div class="head rise"><h2 id="film-title">See it on a desktop.</h2><p>It rises like the sun and keeps an eye on you.</p></div>
+    <div class="head rise"><h2 id="film-title">在桌面上看看。</h2><p>它像太陽一樣升起，並且一直看著你。</p></div>
     <figure class="film__frame rise" style="--i:1">
       <!-- The launch video: add src="media/launch.mp4" here (assemble.mjs already publishes media/*.mp4) and its first
            frame as the poster. Until then the frame shows the poster, a still of the wallpaper. -->
-      <video id="film-video" src="media/desktop.mp4" poster="media/desktop.jpg" muted loop playsinline preload="metadata" aria-label="Grok Bot Wallpaper on a Windows desktop at night"></video>
+      <video id="film-video" src="media/desktop.mp4" poster="media/desktop.jpg" muted loop playsinline preload="metadata" aria-label="夜晚 Windows 桌面上的 Grok Bot 桌布"></video>
     </figure>
   </section>
 
   <section class="install" id="install" aria-labelledby="install-title">
     <div class="panel">
       <div class="head rise">
-        <h2 id="install-title">Install in a minute.</h2>
-        <p>Download, then three steps.</p>
+        <h2 id="install-title">一分鐘就能裝好。</h2>
+        <p>下載，然後三個步驟。</p>
       </div>
       <div class="platforms">
         <article class="tile platform rise" style="--i:1" id="windows" aria-labelledby="windows-title">
           <h3 id="windows-title">Windows</h3>
-          <p class="platform__needs">Windows 10 or 11</p>
+          <p class="platform__needs">Windows 10 或 11</p>
           <div class="get">
-            <a class="btn btn--light" href="download/grokbot-wallpaper-windows.zip" download>Download .zip</a>
-            <span class="get__note">For Lively Wallpaper (free)</span>
+            <a class="btn btn--light" href="download/grokbot-wallpaper-windows.zip" download>下載 .zip</a>
+            <span class="get__note">給 Lively Wallpaper（免費）</span>
           </div>
           <ol class="how">
-            <li><span><b>Install Lively Wallpaper.</b> It is free on the <a href="https://apps.microsoft.com/store/detail/9NTM2QC6QWS7" target="_blank" rel="noopener">Microsoft Store</a>.</span></li>
-            <li><span><b>Drag the zip into Lively.</b> No need to unzip it.</span></li>
-            <li><span><b>Set it as your wallpaper.</b> Click Grok Bot in Lively’s library.</span></li>
+            <li><span><b>安裝 Lively Wallpaper。</b> 可在 <a href="https://apps.microsoft.com/store/detail/9NTM2QC6QWS7" target="_blank" rel="noopener">Microsoft Store</a> 免費取得。</span></li>
+            <li><span><b>把 zip 拖進 Lively。</b> 不必解壓縮。</span></li>
+            <li><span><b>設成桌布。</b> 在 Lively 的資料庫裡點 Grok Bot。</span></li>
           </ol>
         </article>
         <article class="tile platform rise" style="--i:2" id="mac" aria-labelledby="mac-title">
           <h3 id="mac-title">Mac</h3>
-          <p class="platform__needs">macOS 13 or later</p>
+          <p class="platform__needs">macOS 13 或更新版本</p>
           <div class="get">
-            <a class="btn btn--light" href="https://github.com/Bodila51/grokbot-wallpaper/releases/latest/download/GrokBotWallpaper.dmg">Download .dmg</a>
-            <span class="get__note">Apple silicon and Intel</span>
-            <span class="get__note get__note--wrap">If Chrome blocks it, download with Safari or choose Keep.</span>
+            <a class="btn btn--light" href="https://github.com/Bodila51/grokbot-wallpaper/releases/latest/download/GrokBotWallpaper.dmg">下載 .dmg</a>
+            <span class="get__note">Apple 晶片與 Intel</span>
+            <span class="get__note get__note--wrap">若 Chrome 擋下，請用 Safari 下載，或選擇「保留」。</span>
           </div>
           <ol class="how">
-            <li><span><b>Open the .dmg.</b> It is in your Downloads.</span></li>
-            <li><span><b>Drag Grok Bot Wallpaper to Applications.</b></span></li>
-            <li><span><b>First launch: macOS says it can’t check the app.</b> Click Done, then open <span class="path">System Settings → Privacy &amp; Security</span>, scroll down and click Open Anyway. The app isn’t notarized yet, so this happens once.<small class="how__aside">On macOS 14 or earlier: right-click the app, then Open.</small></span></li>
+            <li><span><b>打開 .dmg。</b> 它在「下載項目」裡。</span></li>
+            <li><span><b>把 Grok Bot 桌布拖到「應用程式」。</b></span></li>
+            <li><span><b>第一次開啟時，macOS 會說無法檢查這個 app。</b> 按「完成」，然後打開 <span class="path">系統設定 → 隱私權與安全性</span>，往下捲並按「仍要打開」。這個 app 尚未公證，所以只會出現一次。<small class="how__aside">macOS 14 或更早：在 app 上按右鍵，然後選「打開」。</small></span></li>
           </ol>
         </article>
         <div class="tile bots rise" style="--i:3">
-          <p class="tile__copy"><b>Show your bots.</b> Have a bots channel? Paste it into the wallpaper’s settings and your bots appear beside Grok Bot as live cards. In Lively: <span class="path">Customise → Your bots channel</span>. On a Mac: the 👀 menu-bar icon → <span class="path">Bots channel…</span>.</p>
+          <p class="tile__copy"><b>顯示你的機器人。</b> 已經有機器人頻道？貼進桌布設定，機器人就會以即時卡片出現在 Grok Bot 旁邊。Lively：<span class="path">自訂 → 你的機器人頻道</span>。Mac：👀 選單列圖示 → <span class="path">機器人頻道…</span>。</p>
         </div>
       </div>
     </div>
@@ -385,11 +385,11 @@ footer .links { display: flex; flex-wrap: wrap; gap: 6px 24px; }
   <section class="support" id="support" aria-labelledby="support-title">
     <div class="tile support__tile rise">
       <div class="side">
-        <h2 id="support-title">Keep Grok Bot free.</h2>
-        <p class="tile__copy">It costs nothing to install and is made by one person. If it made your desktop a little better, a donation keeps it free and pays for what comes next.</p>
+        <h2 id="support-title">讓 Grok Bot 繼續免費。</h2>
+        <p class="tile__copy">安裝不用錢，由一個人製作。如果它讓你的桌面好一點，捐款能讓它繼續免費，也支付接下來要做的事。</p>
         <div class="actions">
-          <a class="btn btn--ink" href="https://donate.stripe.com/dRmaEZ3CA17W21Tg9AeAg0r" target="_blank" rel="noopener">Donate</a>
-          <span class="fine">Opens a secure Stripe page in a new tab.</span>
+          <a class="btn btn--ink" href="https://donate.stripe.com/dRmaEZ3CA17W21Tg9AeAg0r" target="_blank" rel="noopener">捐款</a>
+          <span class="fine">會在新分頁打開安全的 Stripe 頁面。</span>
         </div>
       </div>
       <div class="support__pic" aria-hidden="true">
@@ -400,8 +400,8 @@ footer .links { display: flex; flex-wrap: wrap; gap: 6px 24px; }
 </main>
 
 <footer class="quiet">
-  <span>Grok Bot Wallpaper</span>
-  <span class="links"><a href="face/">Open the wallpaper on its own</a><a href="office/">Grok Bot Dashboard</a><a href="https://donate.stripe.com/dRmaEZ3CA17W21Tg9AeAg0r" target="_blank" rel="noopener">Donate</a></span>
+  <span>Grok Bot 桌布</span>
+  <span class="links"><a href="face/">單獨打開桌布</a><a href="office/">Grok Bot 儀表板</a><a href="https://donate.stripe.com/dRmaEZ3CA17W21Tg9AeAg0r" target="_blank" rel="noopener">捐款</a></span>
 </footer>
 
 <script>
@@ -592,12 +592,12 @@ let promptText = null;
 fetch('PROMPT.md', { cache: 'no-cache' }).then((r) => (r.ok ? r.text() : Promise.reject(r.status))).then((md) => {
   const fenced = md.match(/```[^\n]*\n([\s\S]*?)```/);
   promptText = (fenced ? fenced[1] : md).trim();
-}).catch(() => { copyPrompt.textContent = 'Open the setup prompt'; });
+}).catch(() => { copyPrompt.textContent = '開啟設定提示'; });
 copyPrompt.addEventListener('click', async () => {
   if (!promptText) { window.open('https://github.com/Bodila51/grokbot-wallpaper/blob/main/PROMPT.md', '_blank', 'noopener'); return; }
-  try { await navigator.clipboard.writeText(promptText); copyPrompt.textContent = 'Copied. Paste it into Grok Bot'; }
-  catch { copyPrompt.textContent = 'Copy did not work: open PROMPT.md on GitHub'; }
-  clearTimeout(copyPrompt.t); copyPrompt.t = setTimeout(() => { copyPrompt.textContent = 'Copy the setup prompt'; }, 2600);
+  try { await navigator.clipboard.writeText(promptText); copyPrompt.textContent = '已複製，請貼到 Grok Bot'; }
+  catch { copyPrompt.textContent = '複製失敗：請到 GitHub 開啟 PROMPT.md'; }
+  clearTimeout(copyPrompt.t); copyPrompt.t = setTimeout(() => { copyPrompt.textContent = '複製設定提示'; }, 2600);
 });
 
 // ---------- the time of day ----------

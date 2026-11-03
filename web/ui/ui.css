@@ -17,7 +17,7 @@
   --bhq-ease: cubic-bezier(.22, 1, .36, 1);
   --bhq-sheet: cubic-bezier(.32, .72, 0, 1);
   --bhq-spring: cubic-bezier(.2, 1.2, .3, 1);
-  --bhq-round: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bhq-round: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", "PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei", "WenQuanYi Micro Hei", "Droid Sans Fallback", sans-serif;
 }
 
 /* ---------- scoped resets ---------- */

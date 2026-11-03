@@ -13,7 +13,7 @@
 .hq-loading {
   position: absolute; z-index: 4; left: 50%; top: 50%; transform: translate(-50%, -50%);
   display: flex; flex-direction: column; align-items: center; gap: 12px;
-  font: 500 13px/1 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .01em; color: #6E6E73;
+  font: 500 13px/1 Inter, system-ui, -apple-system, "Segoe UI", "PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei", "WenQuanYi Micro Hei", "Droid Sans Fallback", sans-serif; letter-spacing: .01em; color: #6E6E73;
   pointer-events: none; transition: opacity .35s ease;
 }
 .hq-loading > * { animation: hq-loading-in .5s .2s ease-out both; }
@@ -34,7 +34,7 @@
 .hqt {
   display: flex; flex-direction: column; align-items: center;
   pointer-events: none; user-select: none; -webkit-user-select: none;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", "PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei", "WenQuanYi Micro Hei", "Droid Sans Fallback", sans-serif;
 }
 /* animate the children only: CSS2DRenderer owns the transform of .hqt itself */
 .hqt > * { animation: hqt-in .22s cubic-bezier(.2, .8, .2, 1); }

@@ -369,17 +369,17 @@ function buildButton(slot) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'bhq-snd bhq-surface';
-  btn.setAttribute('aria-label', 'Sound');
+  btn.setAttribute('aria-label', '音效');
   btn.setAttribute('aria-haspopup', 'true');
   btn.setAttribute('aria-expanded', 'false');
   btn.innerHTML = ICON_ON + ICON_OFF;
   const pop = document.createElement('div');
   pop.className = 'bhq-snd-pop bhq-surface';
   pop.setAttribute('role', 'group');
-  pop.setAttribute('aria-label', 'Sound');
+  pop.setAttribute('aria-label', '音效');
   pop.hidden = true;
   const rows = {};
-  for (const [key, label] of [['music', 'Music'], ['fx', 'Sounds']]) {
+  for (const [key, label] of [['music', '音樂'], ['fx', '音效']]) {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'bhq-snd-row';

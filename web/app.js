@@ -154,14 +154,14 @@ async function startLocalDemo() {
 }
 
 const STEPS = {
-  working: ['scanning X, 7 searches', 'reading 40 fresh posts', 'drafting a thread', 'checking the numbers', 'compiling the report', 'drawing the cover', 'cross-checking sources'],
-  waiting_user: ['waiting for your answer: publish?', 'need a budget OK', 'which option should we pick?'],
-  error: ['X rate limit 429, retry in 15 min', "couldn't open the report file"],
-  done: ['done: report sent', 'draft ready', 'task closed'],
-  idle: ['waiting for a new task'],
+  working: ['正在掃 X，7 次搜尋', '在讀 40 則新貼文', '正在寫串文草稿', '正在核對數字', '正在彙整報告', '正在畫封面', '正在交叉檢查來源'],
+  waiting_user: ['等你回覆：要發布嗎？', '需要預算同意', '要選哪個方案？'],
+  error: ['X 速率限制 429，15 分鐘後重試', '打不開報告檔案'],
+  done: ['完成：報告已送出', '草稿好了', '任務已關閉'],
+  idle: ['在等新任務'],
 };
-const TASKS = ['Thread about AI agents for Monday', 'Covers for the post series', 'Weekly reach report',
-  'Competitor post breakdown', 'Summary across all floors', 'Plan for the week'];
+const TASKS = ['週一的 AI 代理人串文', '貼文系列封面', '每週觸及報告',
+  '競品貼文拆解', '各樓層總結', '本週計畫'];
 const NEXT = {
   working: [['working', 5], ['done', 3], ['waiting_user', 1], ['error', 0.5]],
   done: [['idle', 3], ['working', 2]],

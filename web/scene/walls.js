@@ -2,7 +2,7 @@
 // `wall_screen` and `task_board` of the open floor (CONTRACT v2.5). Redrawn only when the data changes (≤ 1/s).
 import * as THREE from 'three';
 
-const FONT = 'Inter, system-ui, -apple-system, "Segoe UI", sans-serif';
+const FONT = 'Inter, system-ui, -apple-system, "Segoe UI", "PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei", "WenQuanYi Micro Hei", "Droid Sans Fallback", sans-serif';
 const STATUS = { working: '#34C759', waiting_user: '#FF9F0A', error: '#FF3B30', stuck: '#FF9500', done: '#0A84FF', idle: '#A1A1A6' };
 const RANK = { waiting_user: 0, error: 0, stuck: 0, working: 1, done: 2, idle: 3 };
 const TSK_ID = /^tsk-\d+$/i;
@@ -170,8 +170,8 @@ export class WallDisplays {
     g.textBaseline = 'alphabetic';
     g.fillStyle = '#8E8E93'; g.font = `500 32px ${FONT}`;
     let nx;
-    if (this.accent) nx = this.accentDot(g, 'Today', 44, 62, 51, 20);
-    else { g.fillText('Today · ', 44, 62); nx = 44 + g.measureText('Today · ').width; }
+    if (this.accent) nx = this.accentDot(g, '今天', 44, 62, 51, 20);
+    else { g.fillText('今天 · ', 44, 62); nx = 44 + g.measureText('今天 · ').width; }
     g.fillStyle = '#F5F5F7'; g.font = `650 40px ${FONT}`;
     g.fillText(ellipsize(g, d.floorName || '', 744 - nx), nx, 62);
     // live dot
@@ -179,10 +179,10 @@ export class WallDisplays {
     g.fillStyle = 'rgba(52,199,89,0.25)'; g.beginPath(); g.arc(W - 52, 50, 14, 0, 7); g.fill();
 
     const tiles = [
-      [`${working} of ${bots.length}`, 'working now'],
-      [String(events), 'events today'],
-      [String(done), 'tasks done'],
-      [hours.toFixed(1), 'hours worked'],
+      [`${working}／${bots.length}`, '正在工作'],
+      [String(events), '今日事件'],
+      [String(done), '完成任務'],
+      [hours.toFixed(1), '工作時數'],
     ];
     const tw = 205, gap = 14, x0 = 44, y0 = 100;
     tiles.forEach(([val, label], i) => {
@@ -197,7 +197,7 @@ export class WallDisplays {
     // 24-bar hourly chart, current hour highlighted
     const cx = 44, cw = W - 88, cy = 250, ch = 220;
     g.fillStyle = '#8E8E93'; g.font = `500 17px ${FONT}`;
-    g.fillText('Events by hour', cx, cy - 4);
+    g.fillText('每小時事件', cx, cy - 4);
     const max = Math.max(1, ...hourly);
     const slot = cw / 24, bw = slot * 0.62;
     for (let i = 0; i < 24; i++) {
@@ -230,8 +230,8 @@ export class WallDisplays {
 
     g.fillStyle = '#1D1D1F'; g.font = `700 34px ${FONT}`;
     let nx;
-    if (this.accent) nx = this.accentDot(g, 'Tasks', 36, 49, 37, 20);
-    else { g.fillText('Tasks', 36, 49); nx = 36 + g.measureText('Tasks ').width; }
+    if (this.accent) nx = this.accentDot(g, '任務', 36, 49, 37, 20);
+    else { g.fillText('任務', 36, 49); nx = 36 + g.measureText('任務 ').width; }
     g.fillStyle = '#6E6E73'; g.font = `600 26px ${FONT}`;
     g.fillText(`${this.accent ? '' : '· '}${ellipsize(g, d.floorName || '', 420)}`, nx, 49);
 
@@ -244,7 +244,7 @@ export class WallDisplays {
     }
     if (!shown.length) {
       g.fillStyle = '#8E8E93'; g.font = `600 28px ${FONT}`;
-      g.fillText('Nobody on this floor yet', 36, 160);
+      g.fillText('這層還沒有人', 36, 160);
     }
 
     const cols = 4, pad = 30, gap = 16, top = 90;

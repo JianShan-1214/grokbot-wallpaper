@@ -5,12 +5,12 @@
 // demo state instead. At most 30 frames per second.
 
 const STATUS = {
-  working: { text: 'working', c: 'var(--working)' },
-  waiting_user: { text: 'waiting for you', c: 'var(--waiting)' },
-  error: { text: 'error', c: 'var(--error)' },
-  stuck: { text: 'stuck', c: 'var(--stuck)' },
-  done: { text: 'done', c: 'var(--done)' },
-  idle: { text: 'resting', c: 'var(--idle)' },
+  working: { text: '工作中', c: 'var(--working)' },
+  waiting_user: { text: '等你回覆', c: 'var(--waiting)' },
+  error: { text: '錯誤', c: 'var(--error)' },
+  stuck: { text: '卡住', c: 'var(--stuck)' },
+  done: { text: '完成', c: 'var(--done)' },
+  idle: { text: '休息中', c: 'var(--idle)' },
 };
 const ORDER = ['waiting_user', 'error', 'stuck', 'working', 'done', 'idle'];
 const SHAPES = ['sphere', 'rounded_square', 'pill', 'triangle', 'pentagon', 'hexagon', 'star4', 'star6', 'clover', 'rounded_cube', 'cone', 'trio', 'cloud', 'bubble', 'flower', 'drop'];
@@ -283,7 +283,7 @@ const $ = (id) => document.getElementById(id);
 const stack = $('w-stack'), team = $('team'), grid = $('bot-grid'), needs = $('bot-needs'), tip = $('tip');
 const NEEDS = ['waiting_user', 'error', 'stuck'], NEEDS_FIRST = ['error', 'waiting_user', 'stuck'];
 const TONE = { waiting_user: 'is-waiting', stuck: 'is-waiting', error: 'is-error' };
-const ASKS = { waiting_user: 'needs your reply', stuck: 'stuck, take a look', error: 'error' };
+const ASKS = { waiting_user: '需要你回覆', stuck: '卡住了，看一下', error: '錯誤' };
 let looks = {}, state = null, byId = {}, crew = '';
 
 function statusOf(b) { return STATUS[b.effective_status || b.status] ? (b.effective_status || b.status) : 'idle'; }
@@ -299,9 +299,9 @@ function render(st) {
   countTo($('n-waiting'), waiting);
   countTo($('n-error'), counts.error);
   countTo($('bot-total'), bots.length);
-  $('l-working').textContent = 'working';
-  $('l-waiting').textContent = 'waiting';
-  $('l-error').textContent = counts.error === 1 ? 'error' : 'errors';
+  $('l-working').textContent = '工作中';
+  $('l-waiting').textContent = '等待中';
+  $('l-error').textContent = '錯誤';
   $('row-waiting').classList.toggle('is-zero', !waiting);
   $('row-error').classList.toggle('is-zero', !counts.error);
   team.classList.toggle('is-working', counts.working > 0);           // green while anyone works, graphite at rest
