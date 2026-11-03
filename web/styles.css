@@ -73,7 +73,7 @@
   --panel-w: 352px;
   --radius-lg: 22px;
   --radius-md: 16px;
-  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", "PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei", "WenQuanYi Micro Hei", "Droid Sans Fallback", Roboto, sans-serif;
 }
 
 /* ui.js adds .bhq-ready after the first paint, so the first theme is applied without a fade. */

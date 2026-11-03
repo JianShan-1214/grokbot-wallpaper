@@ -81,7 +81,7 @@ export function initScene(el, cbs = {}) {
     loadingEl = document.createElement('div');
     loadingEl.className = 'hq-loading';
     loadingEl.setAttribute('role', 'status');
-    loadingEl.innerHTML = '<span class="hq-loading-label">Building the office</span><span class="hq-loading-track"><i></i></span>';
+    loadingEl.innerHTML = '<span class="hq-loading-label">正在建造辦公室</span><span class="hq-loading-track"><i></i></span>';
     container.append(loadingEl);
   }
 

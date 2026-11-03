@@ -16,7 +16,7 @@
  * Every DOM node is created once and then patched in place (text / attributes / classes only when the
  * value changed), so hover, focus and scroll positions survive the 1 Hz re-render.
  * All data goes into the DOM through textContent / setAttribute, never innerHTML.
- * The UI text is English. The cards are graphite at every hour; no day/night switch here (see ui.css).
+ * The UI text is Traditional Chinese (zh-Hant). The cards are graphite at every hour; no day/night switch here (see ui.css).
  *
  * Phones (<= 600 px wide, and landscape phones): <html> gets .bhq-phone (+ .bhq-land). The floors become a chip row,
  * and the floor team, "Waiting on me", Finished, Routines and the activity feed move into one bottom sheet (a grabber, a
@@ -38,30 +38,30 @@ const LS_BLUR = 'bothq.waitBlur';
 const LS_DOCK = 'bothq.dock';
 
 const LABEL = {
-  working: 'working',
-  idle: 'resting',
-  waiting_user: 'waiting for you',
-  error: 'error',
-  stuck: 'stuck',
-  done: 'done',
+  working: '工作中',
+  idle: '休息中',
+  waiting_user: '等你回覆',
+  error: '錯誤',
+  stuck: '卡住',
+  done: '完成',
 };
 const CHIP = {
-  working: 'Working',
-  idle: 'Resting',
-  waiting_user: 'Waiting for you',
-  error: 'Error',
-  stuck: 'Stuck',
-  done: 'Done',
+  working: '工作中',
+  idle: '休息中',
+  waiting_user: '等你回覆',
+  error: '錯誤',
+  stuck: '卡住',
+  done: '完成',
 };
 
-// Short counter words [one, many] per status.
+// Short counter words [one, many] per status. Chinese does not pluralize; both forms match.
 const WORDS = {
-  working: ['working', 'working'],
-  waiting_user: ['waiting', 'waiting'],
-  error: ['error', 'errors'],
-  stuck: ['stuck', 'stuck'],
-  idle: ['resting', 'resting'],
-  done: ['done', 'done'],
+  working: ['工作中', '工作中'],
+  waiting_user: ['等待中', '等待中'],
+  error: ['錯誤', '錯誤'],
+  stuck: ['卡住', '卡住'],
+  idle: ['休息中', '休息中'],
+  done: ['完成', '完成'],
 };
 
 // Counters pill. "attention" folds stuck into waiting_user: both need a human.
@@ -73,8 +73,8 @@ const SUMMARY = [
   { key: 'done', s: 'done', n: (c) => c.done, hideZero: true },
 ];
 
-const USAGE_TITLE = { week: 'Week', day: 'Day', month: 'Month' };
-const USAGE_SPENT = { week: 'Usage this week', day: 'Usage today', month: 'Usage this month' };
+const USAGE_TITLE = { week: '本週', day: '今日', month: '本月' };
+const USAGE_SPENT = { week: '本週用量', day: '今日用量', month: '本月用量' };
 
 const ICON = {
   close: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -202,7 +202,7 @@ function hhmm(ms) {
   if (ms == null) return '';
   return TIME_GB.format(new Date(ms));
 }
-const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAY = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
 
 // Server "now" estimated from the client clock: skew is refreshed whenever state.now changes.
 function syncClock(state) {
@@ -215,60 +215,60 @@ function nowMs() { return Date.now() - U.skew; }
 
 function fmtDur(ms) {
   const min = Math.floor(Math.max(0, ms) / 60000);
-  if (min < 1) return 'under a minute';
-  if (min < 60) return min + ' min';
+  if (min < 1) return '不到一分鐘';
+  if (min < 60) return min + ' 分鐘';
   const hr = Math.floor(min / 60), m = min % 60;
-  if (hr < 24) return m ? hr + ' h ' + m + ' min' : hr + ' h';
+  if (hr < 24) return m ? hr + ' 小時 ' + m + ' 分鐘' : hr + ' 小時';
   const d = Math.floor(hr / 24), hh = hr % 24;
-  return hh ? d + ' d ' + hh + ' h' : d + ' d';
+  return hh ? d + ' 天 ' + hh + ' 小時' : d + ' 天';
 }
 function fmtLeft(ms) {
   const min = Math.floor(ms / 60000);
-  if (min < 1) return 'under a minute';
+  if (min < 1) return '不到一分鐘';
   const d = Math.floor(min / 1440), hr = Math.floor((min % 1440) / 60), m = min % 60;
-  if (d > 0) return d + ' d ' + hr + ' h';
-  if (hr > 0) return hr + ' h ' + m + ' min';
-  return m + ' min';
+  if (d > 0) return d + ' 天 ' + hr + ' 小時';
+  if (hr > 0) return hr + ' 小時 ' + m + ' 分鐘';
+  return m + ' 分鐘';
 }
-// "12 min ago"
+// "12 分鐘前"
 function relAgo(ms) {
   const diff = nowMs() - ms;
   const min = Math.floor(diff / 60000);
-  if (min < 1) return 'just now';
-  if (min < 60) return min + ' min ago';
+  if (min < 1) return '剛剛';
+  if (min < 60) return min + ' 分鐘前';
   const hr = Math.floor(min / 60);
-  if (hr < 24) return hr + ' h ago';
-  return Math.floor(hr / 24) + ' d ago';
+  if (hr < 24) return hr + ' 小時前';
+  return Math.floor(hr / 24) + ' 天前';
 }
-// "now", "12m", "3h", "2d": how long a bot has been silent, small enough for every row
+// "現在", "12分", "3時", "2天": how long a bot has been silent, small enough for every row
 function relShort(ms) {
   const min = Math.floor((nowMs() - ms) / 60000);
-  if (min < 1) return 'now';
-  if (min < 60) return min + 'm';
+  if (min < 1) return '現在';
+  if (min < 60) return min + '分';
   const hr = Math.floor(min / 60);
-  return hr < 24 ? hr + 'h' : Math.floor(hr / 24) + 'd';
+  return hr < 24 ? hr + '時' : Math.floor(hr / 24) + '天';
 }
-// "Worked (unreported) · 09:00–13:00": usage rose between two usage lines and the bot posted no status in between
+// "有工作（未回報） · 09:00–13:00": usage rose between two usage lines and the bot posted no status in between
 function unreportedText(bot) {
   const u = bot && bot.unreported;
   if (!u) return '';
   const a = parseTs(u.from), b = parseTs(u.to);
-  return 'Worked (unreported)' + (b == null ? '' : ' · ' + (a == null ? '' : hhmm(a) + '–') + hhmm(b));
+  return '有工作（未回報）' + (b == null ? '' : ' · ' + (a == null ? '' : hhmm(a) + '–') + hhmm(b));
 }
-// "seen 12 min ago" / "never reported", with the exact time in a title
+// "見於 12 分鐘前" / "尚未回報", with the exact time in a title
 function seenText(bot) {
   const t = parseTs(bot && bot.last_seen);
-  return t == null ? 'never reported' : 'seen ' + relAgo(t);
+  return t == null ? '尚未回報' : '見於 ' + relAgo(t);
 }
-// "in 12 min", "in 3 h", "Tue 09:00" (local) when it is more than a day away
+// "12 分鐘後", "3 小時後", "週二 09:00" (local) when it is more than a day away
 function relIn(ms) {
   const diff = ms - nowMs();
-  if (diff <= 0) return 'due now';
+  if (diff <= 0) return '現在到期';
   const min = Math.ceil(diff / 60000);
-  if (min < 60) return 'in ' + min + ' min';
+  if (min < 60) return min + ' 分鐘後';
   const hr = Math.floor(min / 60), m = min % 60;
-  if (hr < 6) return m ? 'in ' + hr + ' h ' + m + ' min' : 'in ' + hr + ' h';
-  if (hr < 24) return 'in ' + hr + ' h';
+  if (hr < 6) return m ? hr + ' 小時 ' + m + ' 分鐘後' : hr + ' 小時後';
+  if (hr < 24) return hr + ' 小時後';
   const d = new Date(ms);
   return WEEKDAY[d.getDay()] + ' ' + hhmm(ms);
 }
@@ -440,18 +440,18 @@ export function initUI(handlers) {
     for (const el of U.owned) if (el.parentNode) el.remove();
   }
   U = freshState(handlers);
-  document.documentElement.lang = 'en';
+  document.documentElement.lang = 'zh-Hant';
 
   const topbar = document.getElementById('topbar');
   const floors = document.getElementById('floors');
   const panel = document.getElementById('panel');
   let feed = document.getElementById('feed');
   if (!feed) { feed = own(h('section', { id: 'feed' })); document.body.append(feed); }
-  setAttr(feed, 'aria-label', 'Activity feed');
+  setAttr(feed, 'aria-label', '動態訊息');
   const scene = document.getElementById('scene');
-  if (scene) setAttr(scene, 'aria-label', 'Office');
-  if (floors) setAttr(floors, 'aria-label', 'Floors');
-  if (panel) setAttr(panel, 'aria-label', 'Bot card and floor team');
+  if (scene) setAttr(scene, 'aria-label', '辦公室');
+  if (floors) setAttr(floors, 'aria-label', '樓層');
+  if (panel) setAttr(panel, 'aria-label', '機器人卡片與樓層團隊');
 
   if (topbar) buildTopbar(topbar); else console.warn('[ui] #topbar not found');
   if (floors) buildFloors(floors); else console.warn('[ui] #floors not found');
@@ -485,12 +485,12 @@ function buildTopbar(root) {
   const clock = h('span', { class: 'bhq-num bhq-clock', text: '--:--' });
   const brand = h('div', { class: 'bhq-brand bhq-surface' },
     h('img', { class: 'bhq-mark', src: MARK_SRC, alt: '', draggable: 'false' }),
-    h('b', { class: 'bhq-word', text: 'Grok Bot Dashboard' }),
+    h('b', { class: 'bhq-word', text: 'Grok Bot 儀表板' }),
     h('span', { class: 'bhq-sep', 'aria-hidden': 'true' }),
-    h('span', { class: 'bhq-live' }, h('i', { class: 'bhq-dot bhq-live-dot', 'aria-hidden': 'true' }), 'Live · ', clock));
+    h('span', { class: 'bhq-live' }, h('i', { class: 'bhq-dot bhq-live-dot', 'aria-hidden': 'true' }), '即時 · ', clock));
 
   const chips = {};
-  const summary = h('div', { class: 'bhq-summary bhq-surface', role: 'group', 'aria-label': 'Bot statuses' });
+  const summary = h('div', { class: 'bhq-summary bhq-surface', role: 'group', 'aria-label': '機器人狀態' });
   for (const p of SUMMARY) {
     const num = h('b', { class: 'bhq-num' });
     const label = h('span');
@@ -500,17 +500,17 @@ function buildTopbar(root) {
     summary.append(el);
   }
 
-  const usageLabel = h('span', { class: 'bhq-usage-label', text: 'Week' });
+  const usageLabel = h('span', { class: 'bhq-usage-label', text: '本週' });
   const fill = h('i');
   const meter = h('span', {
-    class: 'bhq-slider', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': 'Usage limit',
+    class: 'bhq-slider', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': '用量上限',
   }, fill);
   const pct = h('b', { class: 'bhq-num bhq-usage-pct' });
   const reset = h('span', { class: 'bhq-reset' });
   const usage = h('div', { class: 'bhq-usage bhq-surface', hidden: true }, usageLabel, meter, pct, h('span', { class: 'bhq-sep', 'aria-hidden': 'true' }), reset);
-  const demo = h('span', { class: 'bhq-demo bhq-surface', text: 'DEMO', hidden: true, title: 'Demo data, not real bots' });
+  const demo = h('span', { class: 'bhq-demo bhq-surface', text: '示範', hidden: true, title: '示範資料，不是真實機器人' });
   // share an image of the office (web/share/, loaded on first use); audio/sound.js puts the speaker in front of it
-  const share = h('button', { class: 'bhq-share bhq-surface', type: 'button', 'aria-label': 'Share an image of your office', title: 'Share', 'aria-haspopup': 'dialog', 'aria-expanded': 'false' }, svg(ICON.share));
+  const share = h('button', { class: 'bhq-share bhq-surface', type: 'button', 'aria-label': '分享辦公室圖片', title: '分享', 'aria-haspopup': 'dialog', 'aria-expanded': 'false' }, svg(ICON.share));
   const loadShare = () => import('../share/share.js');
   share.addEventListener('pointerenter', loadShare, { once: true });
   share.addEventListener('click', () => {
@@ -531,7 +531,7 @@ function buildFloors(root) {
   const shaft = h('div', { class: 'bhq-shaft' }, car);
   const count = h('b', { class: 'bhq-num' });
   const fscroll = h('div', { class: 'bhq-fscroll' }, shaft);
-  root.append(h('div', { class: 'bhq-fhead' }, h('span', { text: 'Floors' }), count), fscroll);
+  root.append(h('div', { class: 'bhq-fhead' }, h('span', { text: '樓層' }), count), fscroll);
   U.fl = { root, shaft, car, count, fscroll, carTop: null, carH: null, carShown: false, ready: false };
   if (typeof ResizeObserver === 'function') {
     U.ro = new ResizeObserver(() => placeCar());
@@ -561,22 +561,22 @@ function buildPanel(root) {
   const big = h('b', { class: 'bhq-num' });
   const nWait = h('b', { class: 'bhq-num' });
   const nErr = h('b', { class: 'bhq-num' });
-  const lWait = h('em', { text: 'waiting' });
-  const lErr = h('em', { text: 'errors' });
+  const lWait = h('em', { text: '等待中' });
+  const lErr = h('em', { text: '錯誤' });
   const rowWait = h('span', null, lWait, nWait);
   const rowErr = h('span', null, lErr, nErr);
   const head = h('header', { class: 'bhq-thead bhq-surface bhq-glow', 'data-s': 'idle' },
     h('div', { class: 'bhq-ttop' }, teamTitle, teamSub),
     h('div', { class: 'bhq-tbot' },
-      h('div', { class: 'bhq-tbig' }, big, h('span', { text: 'working' })),
+      h('div', { class: 'bhq-tbig' }, big, h('span', { text: '工作中' })),
       h('div', { class: 'bhq-tcounts' }, rowWait, rowErr)));
   const list = watchFade(h('div', { class: 'bhq-members', role: 'list' }));
-  const teamEmpty = h('p', { class: 'bhq-note', text: 'Nobody here yet. A bot shows up when it logs its first step.', hidden: true });
+  const teamEmpty = h('p', { class: 'bhq-note', text: '還沒有人。機器人記下第一步後就會出現。', hidden: true });
   const tcard = h('div', { class: 'bhq-tcard bhq-surface bhq-glow' }, list, teamEmpty);
-  const team = h('section', { class: 'bhq-team', 'aria-label': 'Floor team' }, head, tcard);
+  const team = h('section', { class: 'bhq-team', 'aria-label': '樓層團隊' }, head, tcard);
 
   /* bot card: a hero tinted by the bot's status over a graphite details card */
-  const close = h('button', { class: 'bhq-close', type: 'button', 'aria-label': 'Close bot card', title: 'Close (Esc)' }, svg(ICON.close));
+  const close = h('button', { class: 'bhq-close', type: 'button', 'aria-label': '關閉機器人卡片', title: '關閉（Esc）' }, svg(ICON.close));
   close.addEventListener('click', () => { if (U.h.onSelectBot) U.h.onSelectBot(null); });
 
   const av = makeAva({ cls: 'bhq-ava--lg' });
@@ -592,28 +592,28 @@ function buildPanel(root) {
     status, now);
 
   const task = h('p', { class: 'bhq-task' });
-  const taskBlock = h('div', { class: 'bhq-block', hidden: true }, h('div', { class: 'bhq-label', text: 'Task' }), task);
+  const taskBlock = h('div', { class: 'bhq-block', hidden: true }, h('div', { class: 'bhq-label', text: '任務' }), task);
 
   const stat = (unit) => {
     const v = h('b', { class: 'bhq-num' }); const l = h('small', { text: unit || '' });
     return { root: h('div', { class: 'bhq-stat' }, v, l), v, l };
   };
-  const sSteps = stat(), sTasks = stat(), sHours = stat('h worked');
+  const sSteps = stat(), sTasks = stat(), sHours = stat('工作時數');
   const stats = h('div', { class: 'bhq-stats' }, sSteps.root, sTasks.root, sHours.root);
 
   const usageLabel = h('div', { class: 'bhq-label' });
   const fillBar = h('i');
-  const fuel = h('span', { class: 'bhq-slider', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': 'Share of total usage' }, fillBar);
+  const fuel = h('span', { class: 'bhq-slider', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': '佔總用量比例' }, fillBar);
   const shareNum = h('b', { class: 'bhq-num' });
-  const share = h('span', { class: 'bhq-share' }, shareNum, ' of all');
+  const share = h('span', { class: 'bhq-share' }, shareNum, ' 佔全部');
   const useBlock = h('div', { class: 'bhq-useblock' }, usageLabel, h('div', { class: 'bhq-use' }, fuel, share));
 
   const hist = h('ol', { class: 'bhq-steps', role: 'list' });
-  const stepsBlock = h('div', { class: 'bhq-stepsblock' }, h('div', { class: 'bhq-label', text: 'Recent steps' }), hist);
+  const stepsBlock = h('div', { class: 'bhq-stepsblock' }, h('div', { class: 'bhq-label', text: '最近步驟' }), hist);
 
   const body = watchFade(h('div', { class: 'bhq-card-body' }, taskBlock, stats, useBlock, stepsBlock));
 
-  const cta = h('button', { class: 'bhq-cta', type: 'button', text: 'Open chat', disabled: true, title: 'No chat link yet' });
+  const cta = h('button', { class: 'bhq-cta', type: 'button', text: '開啟對話', disabled: true, title: '還沒有對話連結' });
   cta.addEventListener('click', () => {
     const b = U.last.state && U.last.state.bots && U.last.state.bots[U.cardBot];
     if (!b || !b.chat_url) return;
@@ -622,7 +622,7 @@ function buildPanel(root) {
 
   const more = h('div', { class: 'bhq-more bhq-surface bhq-glow bhq-glow--still' }, body, h('div', { class: 'bhq-card-foot' }, cta));
   const cgrab = h('span', { class: 'bhq-cgrab', 'aria-hidden': 'true' });
-  const card = h('section', { class: 'bhq-card', hidden: true, 'aria-label': 'Bot card' }, cgrab, hero, more);
+  const card = h('section', { class: 'bhq-card', hidden: true, 'aria-label': '機器人卡片' }, cgrab, hero, more);
 
   root.append(card, team);
 
@@ -646,8 +646,8 @@ function buildFeed(root) {
   root.textContent = '';
   root.classList.add('bhq-surface', 'bhq-glow', 'bhq-glow--still');
   const list = h('ol', { class: 'bhq-frows', role: 'list', 'aria-live': 'off' });
-  const empty = h('p', { class: 'bhq-note', text: 'No events yet.', hidden: true });
-  root.append(h('div', { class: 'bhq-fhead' }, h('span', { text: 'Activity' })), list, empty);
+  const empty = h('p', { class: 'bhq-note', text: '還沒有事件。', hidden: true });
+  root.append(h('div', { class: 'bhq-fhead' }, h('span', { text: '動態' })), list, empty);
   U.feed = { root, list, empty };
 }
 
@@ -657,10 +657,10 @@ function buildZoom() {
     b.addEventListener('click', () => { if (U.h.onZoom) U.h.onZoom(dir); });
     return b;
   };
-  const root = own(h('div', { class: 'bhq-zoom bhq-surface', role: 'group', 'aria-label': 'Scene zoom' },
-    mk('z-out', ICON.minus, 'Zoom out', 'out'),
+  const root = own(h('div', { class: 'bhq-zoom bhq-surface', role: 'group', 'aria-label': '場景縮放' },
+    mk('z-out', ICON.minus, '縮小', 'out'),
     h('span', { class: 'bhq-sep', 'aria-hidden': 'true' }),
-    mk('z-in', ICON.plus, 'Zoom in', 'in')));
+    mk('z-in', ICON.plus, '放大', 'in')));
   document.body.append(root);
   U.zoom = { root };
 }
@@ -675,7 +675,7 @@ function dockCard(id, title, opts) {
   const head = h('div', { class: 'bhq-dh' + (opts && opts.eye ? ' has-eye' : '') }, toggle);
   let eye = null;
   if (opts && opts.eye) {
-    eye = h('button', { class: 'bhq-eye', type: 'button', 'aria-pressed': 'false', 'aria-label': 'Hide this panel for the camera', title: 'Hide for the camera' },
+    eye = h('button', { class: 'bhq-eye', type: 'button', 'aria-pressed': 'false', 'aria-label': '拍照時隱藏此面板', title: '拍照時隱藏' },
       svg(ICON.eyeOn), svg(ICON.eyeOff));
     head.append(eye);
   }
@@ -732,29 +732,29 @@ function setWaitBlur(on, save = true) {
   d.blurred = !!on;
   setCls(d.waiting.root, 'is-blurred', d.blurred);
   setAttr(d.waiting.eye, 'aria-pressed', d.blurred ? 'true' : 'false');
-  setAttr(d.waiting.eye, 'aria-label', d.blurred ? 'Show this panel' : 'Hide this panel for the camera');
-  setAttr(d.waiting.eye, 'title', d.blurred ? 'Show' : 'Hide for the camera');
+  setAttr(d.waiting.eye, 'aria-label', d.blurred ? '顯示此面板' : '拍照時隱藏此面板');
+  setAttr(d.waiting.eye, 'title', d.blurred ? '顯示' : '拍照時隱藏');
   d.wlist.inert = d.blurred;
   if (save) lsSet(LS_BLUR, d.blurred ? '1' : '0');
 }
 
 function buildDock(floors, feed) {
-  const root = own(h('aside', { class: 'bhq-dock', 'aria-label': 'Waiting on me, finished work and routines' }));
-  const check = dockCard('check', 'Status check');
-  const waiting = dockCard('waiting', 'Waiting on me', { eye: true });
-  const finished = dockCard('finished', 'Finished');
-  const routines = dockCard('routines', 'Routines');
+  const root = own(h('aside', { class: 'bhq-dock', 'aria-label': '等我處理、已完成與例行工作' }));
+  const check = dockCard('check', '狀態檢查');
+  const waiting = dockCard('waiting', '等我處理', { eye: true });
+  const finished = dockCard('finished', '已完成');
+  const routines = dockCard('routines', '例行工作');
 
   const wlist = h('div', { class: 'bhq-wlist' });
-  const wempty = h('p', { class: 'bhq-note', text: 'Nothing is waiting on you.', hidden: true });
+  const wempty = h('p', { class: 'bhq-note', text: '沒有在等你的事。', hidden: true });
   waiting.inner.append(wlist, wempty);
 
   const tl = h('ol', { class: 'bhq-tl', role: 'list' });
-  const fempty = h('p', { class: 'bhq-note', text: 'Nothing finished in the last 24 hours.', hidden: true });
+  const fempty = h('p', { class: 'bhq-note', text: '過去 24 小時沒有完成的事。', hidden: true });
   finished.inner.append(tl, fempty);
 
   const rl = h('ul', { class: 'bhq-rl', role: 'list' });
-  const rempty = h('p', { class: 'bhq-note', text: 'No routines scheduled.', hidden: true });
+  const rempty = h('p', { class: 'bhq-note', text: '沒有排定的例行工作。', hidden: true });
   routines.inner.append(rl, rempty);
 
   const cl = h('ul', { class: 'bhq-ck', role: 'list' });
@@ -881,12 +881,12 @@ function rootVar(name, v) {
 }
 
 function buildSheet(feed) {
-  const grab = h('button', { class: 'bhq-sgrab', type: 'button', 'aria-expanded': 'false', 'aria-label': 'Expand panel' }, h('i', { 'aria-hidden': 'true' }));
+  const grab = h('button', { class: 'bhq-sgrab', type: 'button', 'aria-expanded': 'false', 'aria-label': '展開面板' }, h('i', { 'aria-hidden': 'true' }));
   const headSlot = h('div', { class: 'bhq-shead' });
   const peek = h('div', { class: 'bhq-speek' }, grab, headSlot);
   const body = h('div', { class: 'bhq-sbody' });
   const probe = h('i', { class: 'bhq-sprobe', 'aria-hidden': 'true' }); // its height is the bottom safe area
-  const root = own(h('div', { class: 'bhq-sheet', role: 'region', 'aria-label': 'Floor panel' }, peek, body, probe));
+  const root = own(h('div', { class: 'bhq-sheet', role: 'region', 'aria-label': '樓層面板' }, peek, body, probe));
   document.body.append(root);
   const S = U.sh = { root, peek, body, grab, headSlot, probe, feed, y: 0, H: 0, travel: 0, vis0: 132, open: false, busy: false, cancel: null };
   S.start = new URLSearchParams(location.search).get('sheet') === 'open';
@@ -995,7 +995,7 @@ function sheetGo(open, v0, instant) {
   if (!S || !U.phone) return;
   S.open = !!open;
   setAttr(S.grab, 'aria-expanded', S.open ? 'true' : 'false');
-  setAttr(S.grab, 'aria-label', S.open ? 'Collapse panel' : 'Expand panel');
+  setAttr(S.grab, 'aria-label', S.open ? '收合面板' : '展開面板');
   setCls(S.root, 'is-open', S.open);
   S.body.inert = !S.open && !U.land;
   if (S.cancel) { S.cancel(); S.cancel = null; }
@@ -1125,9 +1125,9 @@ function renderTopbar(state) {
     setCls(r.el, 'is-zero', n === 0);
     setCls(r.el, 'is-alert', !!p.alert && n > 0);
     if (p.hideZero) setHidden(r.el, n === 0);
-    let title = n + ' ' + label;
+    let title = n + ' 個' + label;
     if (p.key === 'attention' && c.stuck > 0) {
-      title = c.waiting_user + ' ' + statusWord('waiting_user', c.waiting_user) + ', ' + c.stuck + ' stuck';
+      title = c.waiting_user + ' 個' + statusWord('waiting_user', c.waiting_user) + '，' + c.stuck + ' 個卡住';
     }
     setAttr(r.el, 'title', title);
   }
@@ -1138,7 +1138,7 @@ function renderTopbar(state) {
   setHidden(t.usage, pct == null);
   if (pct != null) {
     const level = pct >= 95 ? 'error' : pct >= 85 ? 'warn' : null;
-    setText(t.usageLabel, USAGE_TITLE[u.period] || 'Limit');
+    setText(t.usageLabel, USAGE_TITLE[u.period] || '上限');
     setVar(t.meter, '--p', (pct / 100).toFixed(3));
     setText(t.pct, Math.round(pct) + '%');
     setAttr(t.meter, 'aria-valuenow', Math.round(pct));
@@ -1149,14 +1149,14 @@ function renderTopbar(state) {
     const resetAt = parseTs(u.resets_at);
     if (resetAt != null) {
       const left = resetAt - nowMs();
-      resetText = left > 0 ? 'resets in ' + fmtLeft(left) : 'resetting now';
+      resetText = left > 0 ? fmtLeft(left) + '後重置' : '正在重置';
     }
     setText(t.reset, resetText);
     setHidden(t.reset, !resetText);
     const sep = t.reset.previousElementSibling;
     if (sep) setHidden(sep, !resetText);
     const upd = parseTs(u.updated_at);
-    setAttr(t.usage, 'title', upd != null ? 'Updated at ' + hhmm(upd) : null);
+    setAttr(t.usage, 'title', upd != null ? '更新於 ' + hhmm(upd) : null);
   }
 
   setHidden(t.demo, !state.demo);
@@ -1168,9 +1168,9 @@ function countsText(c) {
   const parts = [];
   for (const s of ['working', 'waiting_user', 'error', 'stuck', 'done', 'idle']) {
     const n = Number(c && c[s]) || 0;
-    if (n > 0) parts.push(n + ' ' + statusWord(s, n));
+    if (n > 0) parts.push(n + ' 個' + statusWord(s, n));
   }
-  return parts.join(', ');
+  return parts.join('、');
 }
 
 function floorBotIds(state, fl) {
@@ -1214,7 +1214,7 @@ function renderFloors(state, o) {
     setAttr(r.btn, 'data-alert', need);
 
     const summary = countsText(fl.counts);
-    setAttr(r.btn, 'aria-label', 'Floor ' + number + ', ' + (fl.name || fl.id) + ': ' + ids.length + ' ' + plural(ids.length, 'bot', 'bots') + (summary ? ' (' + summary + ')' : ''));
+    setAttr(r.btn, 'aria-label', '第 ' + number + ' 樓，' + (fl.name || fl.id) + '：' + ids.length + ' 個機器人' + (summary ? '（' + summary + '）' : ''));
     setAttr(r.btn, 'title', summary || null);
     setAttr(r.btn, 'aria-current', fl.id === activeId ? 'true' : null);
   });
@@ -1332,7 +1332,7 @@ function renderTeam(state, floor, o) {
   }
   U.teamReady = true;
 
-  setText(p.teamTitle, floor ? floor.name || floor.id : 'No floor selected');
+  setText(p.teamTitle, floor ? floor.name || floor.id : '尚未選擇樓層');
   const n = ids.length;
   let working = 0, waiting = 0, errors = 0;
   for (const id of ids) {
@@ -1341,13 +1341,13 @@ function renderTeam(state, floor, o) {
     else if (s === 'waiting_user' || s === 'stuck') waiting++;
     else if (s === 'error') errors++;
   }
-  setText(p.teamSub, floor ? n + ' ' + plural(n, 'bot', 'bots') : (U.phone ? 'Pick a floor above' : 'Pick a floor on the left'));
+  setText(p.teamSub, floor ? n + ' 個機器人' : (U.phone ? '請選擇上方樓層' : '請選擇左側樓層'));
   // green while anyone works, graphite at rest (the wallpaper's team card)
   setAttr(p.teamHead, 'data-s', working > 0 ? 'working' : 'idle');
   setNum(p.teamBig, working, animate);
   setNum(p.nWait, waiting, animate);
   setNum(p.nErr, errors, animate);
-  setText(p.lErr, errors === 1 ? 'error' : 'errors');
+  setText(p.lErr, '錯誤');
   setCls(p.rowWait, 'is-zero', !waiting);
   setCls(p.rowErr, 'is-zero', !errors);
   setHidden(p.teamEmpty, n > 0 || !floor);
@@ -1369,7 +1369,7 @@ function renderTeam(state, floor, o) {
     setAttr(c.step, 'data-u', unrep ? '' : null);
     const seenAt = parseTs(bot.last_seen);
     setText(c.seen, seenAt == null ? '–' : relShort(seenAt));
-    setAttr(c.seen, 'title', seenAt == null ? 'No status line yet' : 'Last status line ' + relAgo(seenAt) + ' (' + hhmm(seenAt) + ')');
+    setAttr(c.seen, 'title', seenAt == null ? '還沒有狀態' : '上次狀態 ' + relAgo(seenAt) + '（' + hhmm(seenAt) + '）');
     setAttr(c.btn, 'data-s', s);
     setAttr(c.btn, 'aria-label', (bot.name || id) + ', ' + statusLabel(s) + ', ' + seenText(bot));
     setAttr(c.btn, 'title', (bot.name || id) + ': ' + statusLabel(s) + (bot.step ? '. ' + bot.step : '') + ' · ' + seenText(bot));
@@ -1398,16 +1398,16 @@ function renderCard(state, bot) {
 
   const fl = (state.floors || []).find((x) => x.id === bot.floor);
   const where = (fl && (fl.name || fl.id)) || bot.group || '';
-  const desk = Number.isFinite(Number(bot.desk)) && bot.desk != null ? ' · desk ' + Number(bot.desk) : '';
+  const desk = Number.isFinite(Number(bot.desk)) && bot.desk != null ? ' · 座位 ' + Number(bot.desk) : '';
   setText(c.where, where + desk + ' · ' + seenText(bot));
 
   setAttr(c.stDot, 'data-s', s);
   const since = parseTs(bot.since);
-  const age = since == null ? '' : ' · ' + (now - since < 60000 ? 'just now' : fmtDur(now - since));
+  const age = since == null ? '' : ' · ' + (now - since < 60000 ? '剛剛' : fmtDur(now - since));
   setText(c.stTxt, (CHIP[s] || statusLabel(s)) + age);
 
   const unrep = s === 'idle' ? unreportedText(bot) : '';
-  setText(c.now, unrep || (s === 'idle' && bot.status === 'working' ? 'Went quiet after: ' + (bot.step || 'a task') : bot.step || 'No data on the current step'));
+  setText(c.now, unrep || (s === 'idle' && bot.status === 'working' ? '之後沒有動靜：' + (bot.step || '一項任務') : bot.step || '沒有目前步驟的資料'));
 
   // Task: hide when empty, id-like ("tsk-1643") or a plain copy of the current step.
   const task = typeof bot.task === 'string' ? bot.task.trim() : '';
@@ -1419,14 +1419,14 @@ function renderCard(state, bot) {
   const td = bot.today || {};
   const ev = Number(td.events) || 0, tk = Number(td.tasks_done) || 0;
   setNum(c.sSteps.v, ev, animate);
-  setText(c.sSteps.l, plural(ev, 'step', 'steps'));
+  setText(c.sSteps.l, plural(ev, '步驟', '步驟'));
   setNum(c.sTasks.v, tk, animate);
-  setText(c.sTasks.l, plural(tk, 'task', 'tasks'));
+  setText(c.sTasks.l, plural(tk, '任務', '任務'));
   setText(c.sHours.v, fmtHours(td.working_min));
 
   // usage share (hidden when there is no figure)
   const period = state.usage && state.usage.period;
-  setText(c.usageLabel, USAGE_SPENT[period] || 'Usage');
+  setText(c.usageLabel, USAGE_SPENT[period] || '用量');
   const share = Number.isFinite(bot.usage_share) ? clamp(bot.usage_share, 0, 1) : null;
   setHidden(c.useBlock, share == null);
   if (share != null) {
@@ -1443,14 +1443,14 @@ function renderCard(state, bot) {
   if (sig !== c.histSig) {
     c.histSig = sig;
     c.hist.textContent = '';
-    if (!hist.length) c.hist.append(h('li', { class: 'bhq-step-empty', text: 'No steps yet.' }));
+    if (!hist.length) c.hist.append(h('li', { class: 'bhq-step-empty', text: '還沒有步驟。' }));
     for (const x of hist) c.hist.append(histRow(x));
   }
 
   // chat button
   const has = !!bot.chat_url;
   if (c.cta.disabled === has) c.cta.disabled = !has;
-  setAttr(c.cta, 'title', has ? null : 'No chat link yet');
+  setAttr(c.cta, 'title', has ? null : '還沒有對話連結');
   c.fresh = false;
 }
 
@@ -1575,14 +1575,14 @@ function renderCheck(state) {
     setText(r.name, b.name || id);
     const at = parseTs(b.at);
     setAttr(r.li, 'data-ok', at != null ? 'yes' : late ? 'no' : 'wait');
-    setText(r.at, at != null ? '✓ ' + hhmm(at) : late ? 'no answer' : 'waiting…');
+    setText(r.at, at != null ? '✓ ' + hhmm(at) : late ? '未回覆' : '等待中…');
     return r.li;
   });
   for (const [id, r] of d.crows) if (!seen.has(id)) { r.li.remove(); d.crows.delete(id); }
   reconcile(d.cl, els, 0);
-  setText(d.cnote, ok === list.length ? 'Every bot answered.'
-    : late ? 'Ask the bots that did not answer to re-read their instructions, or run the setup again.'
-      : 'Started ' + hhmm(started) + '. Each bot ticks off when its own status line arrives.');
+  setText(d.cnote, ok === list.length ? '每個機器人都回覆了。'
+    : late ? '請沒回覆的機器人重新閱讀指示，或再執行一次設定。'
+      : '於 ' + hhmm(started) + ' 開始。各機器人的狀態送到後就會打勾。');
 }
 
 /* Waiting on me: every bot that is waiting for the user or in error, newest first. */
@@ -1590,7 +1590,7 @@ function renderCheck(state) {
 function makeWaitRow(id) {
   const av = makeAva();
   const name = h('button', { class: 'bhq-wname', type: 'button' });
-  const btn = h('button', { class: 'bhq-wbtn', type: 'button', text: 'Open chat', hidden: true });
+  const btn = h('button', { class: 'bhq-wbtn', type: 'button', text: '開啟對話', hidden: true });
   const st = h('b');
   const step = h('span');
   const text = h('p', { class: 'bhq-wtext' }, st, step);
@@ -1674,7 +1674,7 @@ function renderFinished(state) {
         av.root,
         h('div', { class: 'bhq-tl-main' },
           h('div', { class: 'bhq-tl-top' }, h('b', { class: 'bhq-tl-name', text: x.e.name || bot.name || x.e.bot || '' }), time),
-          h('div', { class: 'bhq-tl-step', text: x.e.step || 'done', title: x.e.step || '' })));
+          h('div', { class: 'bhq-tl-step', text: x.e.step || '完成', title: x.e.step || '' })));
       d.tl.append(li);
       return { time, t: x.t };
     });
@@ -1704,7 +1704,7 @@ async function turnOffRoutine(r, ref) {
   const d = U.dock;
   const cmd = 'pause routine ' + r.routine;
   const ok = await copyText(cmd);
-  setText(ref.noteText, ok ? 'Copied — paste it in the chat' : 'Could not copy — send: ' + cmd);
+  setText(ref.noteText, ok ? '已複製，請貼到對話裡' : '無法複製，請傳送：' + cmd);
   const key = ref.key;
   clearTimeout(d.copied.get(key));
   ref.li.classList.add('is-copied');
@@ -1738,7 +1738,7 @@ function renderRoutines(state) {
       setAvatar(av, bot, null);
       const next = h('span', { class: 'bhq-rnext bhq-num' });
       const noteText = h('span');
-      const btn = h('button', { class: 'bhq-roff', type: 'button', text: 'Turn off', title: 'Copies "pause routine ' + r.routine + '" and opens the chat' });
+      const btn = h('button', { class: 'bhq-roff', type: 'button', text: '關閉', title: '會複製「pause routine ' + r.routine + '」並開啟對話' });
       const li = h('li', { class: 'bhq-rrow' + (d.copied.has(key) ? ' is-copied' : '') },
         av.root,
         h('div', { class: 'bhq-rmain' },
@@ -1748,14 +1748,14 @@ function renderRoutines(state) {
             h('span', { class: 'bhq-rnote', role: 'status' }, svg(ICON.check), noteText),
             btn)));
       const ref = { li, next, noteText, key, t: parseTs(r.next_run) };
-      setText(noteText, 'Copied — paste it in the chat');
+      setText(noteText, '已複製，請貼到對話裡');
       btn.addEventListener('click', () => turnOffRoutine(r, ref));
       d.rl.append(li);
       return ref;
     });
   }
   for (const ref of d.routRefs) {
-    setText(ref.next, ref.t == null ? 'no date' : relIn(ref.t));
+    setText(ref.next, ref.t == null ? '沒有日期' : relIn(ref.t));
     setAttr(ref.next, 'title', ref.t == null ? null : fullLocal(ref.t));
   }
 }

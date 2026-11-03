@@ -16,10 +16,11 @@ const W = 1600, H = 900;
 const SUPERSAMPLE = 1.5;                               // desktop only: phones render at 1x (GPU memory)
 const MARK_SRC = new URL('../../assets/brand/logo-mark.png', import.meta.url).href;
 const FILE_NAME = 'grok-bot-office.png';
-const POST_TEXT = 'My Grok Bot office';
+const POST_TEXT = '我的 Grok Bot 辦公室';
 const INK = '#16171A', GREY = '#7A7B82', WORKING = '#34C759';
-const BRAND_FONT = '"Nunito", ui-rounded, system-ui, sans-serif';
-const TEXT_FONT = '"Inter", system-ui, -apple-system, "Segoe UI", sans-serif';
+const CJK = '"PingFang TC", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei", "WenQuanYi Micro Hei", "Droid Sans Fallback"';
+const BRAND_FONT = `"Nunito", ui-rounded, system-ui, ${CJK}, sans-serif`;
+const TEXT_FONT = `"Inter", system-ui, -apple-system, "Segoe UI", ${CJK}, sans-serif`;
 const MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
 let C = null;                                          // the card, built once
@@ -63,7 +64,7 @@ function caption(g, mark, parts) {
   g.fillStyle = INK;
   g.font = `900 34px ${BRAND_FONT}`;
   track(g, -0.3);
-  g.fillText('Grok Bot Dashboard', mark ? m + s + 18 : m, cy + capHalf(g));
+  g.fillText('Grok Bot 儀表板', mark ? m + s + 18 : m, cy + capHalf(g));
 
   // "18 bots · 4 teams · ● 6 working now": the numbers in ink, the words in grey, right-aligned
   track(g, 0);
@@ -96,9 +97,9 @@ function stats(state) {
   const bots = Object.values(state?.bots || {});
   const teams = (state?.floors || []).length;
   const working = bots.filter((b) => (b.effective_status || b.status) === 'working').length;
-  const parts = [{ n: bots.length, word: bots.length === 1 ? 'bot' : 'bots' }];
-  if (teams > 1) parts.push({ n: teams, word: 'teams' });
-  if (working) parts.push({ n: working, word: 'working now', dot: true });
+  const parts = [{ n: bots.length, word: '個機器人' }];
+  if (teams > 1) parts.push({ n: teams, word: '個團隊' });
+  if (working) parts.push({ n: working, word: '個正在工作', dot: true });
   return parts;
 }
 
@@ -135,7 +136,7 @@ function fonts() {
   if (!document.fonts?.load) return Promise.resolve();
   const want = [`900 34px ${BRAND_FONT}`, `500 26px ${TEXT_FONT}`, `650 26px ${TEXT_FONT}`];
   return Promise.race([
-    Promise.all(want.map((f) => document.fonts.load(f, 'Grok Bot Dashboard 0123456789 teams working now'))),
+    Promise.all(want.map((f) => document.fonts.load(f, 'Grok Bot 儀表板 0123456789 機器人團隊正在工作'))),
     new Promise((r) => setTimeout(r, 2000)),
   ]).catch(() => {});
 }
@@ -158,20 +159,20 @@ const coarse = () => matchMedia('(pointer: coarse)').matches;
 const canCopy = () => !!(navigator.clipboard?.write && window.ClipboardItem);
 
 function build() {
-  const close_ = h('button', { class: 'bhq-shr-x', type: 'button', 'aria-label': 'Close', title: 'Close (Esc)' });
+  const close_ = h('button', { class: 'bhq-shr-x', type: 'button', 'aria-label': '關閉', title: '關閉（Esc）' });
   close_.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
-  const img = h('img', { alt: 'Your office, ready to post', draggable: 'false' });
-  const wait = h('span', { class: 'bhq-shr-wait', text: 'Framing your office…' });
+  const img = h('img', { alt: '你的辦公室，可以發文了', draggable: 'false' });
+  const wait = h('span', { class: 'bhq-shr-wait', text: '正在構圖…' });
   const pic = h('div', { class: 'bhq-shr-img' }, img, wait);
   const btn = (label, cls = '') => h('button', { class: `bhq-shr-btn ${cls}`.trim(), type: 'button', text: label, disabled: true });
-  const share = btn('Share…', 'bhq-shr-btn--main');
-  const copy = btn('Copy image');
-  const save = btn('Download');
-  const post = btn('Post on X', 'bhq-shr-btn--main');
+  const share = btn('分享…', 'bhq-shr-btn--main');
+  const copy = btn('複製圖片');
+  const save = btn('下載');
+  const post = btn('發到 X', 'bhq-shr-btn--main');
   const acts = h('div', { class: 'bhq-shr-acts' });
   const note = h('p', { class: 'bhq-shr-note', role: 'status', 'aria-live': 'polite' });
-  const root = h('div', { class: 'bhq-shr bhq-surface', role: 'dialog', 'aria-label': 'Share your office', tabindex: '-1', hidden: true },
-    h('div', { class: 'bhq-shr-head' }, h('b', { class: 'bhq-shr-title', text: 'Share your office' }), close_),
+  const root = h('div', { class: 'bhq-shr bhq-surface', role: 'dialog', 'aria-label': '分享你的辦公室', tabindex: '-1', hidden: true },
+    h('div', { class: 'bhq-shr-head' }, h('b', { class: 'bhq-shr-title', text: '分享你的辦公室' }), close_),
     pic, acts, note);
   document.body.append(root);
   C = { root, img, pic, wait, acts, note, share, copy, save, post, blob: null, url: null, file: null, anchor: null, state: null };
@@ -199,11 +200,11 @@ function open() {
   const phone = coarse() && typeof navigator.canShare === 'function';
   root.classList.toggle('bhq-shr--phone', innerWidth <= 600);
   C.acts.replaceChildren(...(phone ? [C.share, C.save] : canCopy() ? [C.copy, C.save, C.post] : [C.save, C.post]));
-  setNote(phone ? '' : canCopy() ? `Post on X copies the image: paste it with ${MAC ? '⌘V' : 'Ctrl V'}.` : '');
+  setNote(phone ? '' : canCopy() ? `發到 X 會先複製圖片，請用 ${MAC ? '⌘V' : 'Ctrl V'} 貼上。` : '');
   for (const b of [C.share, C.copy, C.save, C.post]) b.disabled = true;
   C.pic.classList.remove('is-ready');
   C.wait.hidden = false;
-  C.wait.textContent = 'Framing your office…';
+  C.wait.textContent = '正在構圖…';
   root.hidden = false;
   place();
   C.anchor?.setAttribute('aria-expanded', 'true');
@@ -217,7 +218,7 @@ function open() {
     let blob = null;
     try { blob = await makeShareImage(C.state); } catch (err) { console.warn('[share]', err); }
     if (id !== job) return;
-    if (!blob) { C.wait.textContent = 'The office is still loading. Try again in a moment.'; return; }
+    if (!blob) { C.wait.textContent = '辦公室還在載入，請稍後再試。'; return; }
     if (C.url) URL.revokeObjectURL(C.url);
     C.blob = blob;
     C.url = URL.createObjectURL(blob);
@@ -262,7 +263,7 @@ async function copyBlob() {
 
 async function onCopy() {
   const ok = await copyBlob();
-  setNote(ok ? 'Copied. Paste it anywhere.' : 'Copying is blocked here. Use Download instead.');
+  setNote(ok ? '已複製，可以貼到任何地方。' : '這裡無法複製，請改用下載。');
   if (ok) sfx.tick();
 }
 
@@ -280,7 +281,7 @@ async function onPost() {
   // no link: the site's front page is not the dashboard's, and the page's own address carries the user's topic
   const q = new URLSearchParams({ text: POST_TEXT });
   window.open(`https://x.com/intent/post?${q}`, '_blank', 'noopener');
-  setNote(ok ? `Image copied. In the post, paste it with ${MAC ? '⌘V' : 'Ctrl V'}.` : 'Download the image, then add it to your post.');
+  setNote(ok ? `圖片已複製。在貼文中用 ${MAC ? '⌘V' : 'Ctrl V'} 貼上。` : '請下載圖片，再加到貼文。');
 }
 
 async function onShare() {
@@ -288,6 +289,6 @@ async function onShare() {
   try {
     await navigator.share({ files: [C.file], text: POST_TEXT });
   } catch (err) {
-    if (err?.name !== 'AbortError') setNote('Sharing did not work here. Use Download instead.');
+    if (err?.name !== 'AbortError') setNote('這裡無法分享，請改用下載。');
   }
 }

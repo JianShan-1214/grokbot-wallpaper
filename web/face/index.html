@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Grok Bot Wallpaper</title>
+<title>Grok Bot 桌布</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./face.css">
@@ -16,23 +16,23 @@
   <div class="grain" aria-hidden="true"></div>
 
   <!-- the live cards: one small column; drag it anywhere (the spot is remembered), double-click puts it back -->
-  <section class="stack" id="w-stack" aria-label="My bots" hidden>
+  <section class="stack" id="w-stack" aria-label="我的機器人" hidden>
     <article class="card team is-idle" id="team">
       <div class="team__top">
-        <div class="team__big"><b class="num" id="n-working">0</b><span id="l-working">working</span></div>
+        <div class="team__big"><b class="num" id="n-working">0</b><span id="l-working">工作中</span></div>
         <div class="team__list">
-          <span id="row-waiting"><em id="l-waiting">waiting</em><b class="num" id="n-waiting">0</b></span>
-          <span id="row-error"><em id="l-error">errors</em><b class="num" id="n-error">0</b></span>
+          <span id="row-waiting"><em id="l-waiting">等待中</em><b class="num" id="n-waiting">0</b></span>
+          <span id="row-error"><em id="l-error">錯誤</em><b class="num" id="n-error">0</b></span>
         </div>
       </div>
-      <div class="meter" title="Weekly usage limit">
+      <div class="meter" title="每週用量上限">
         <span class="slider"><span class="slider__fill"></span></span>
-        <span class="meter__label">limit <b class="num" id="usage">0%</b></span>
+        <span class="meter__label">上限 <b class="num" id="usage">0%</b></span>
       </div>
     </article>
     <div class="needs" id="bot-needs"></div>
     <article class="card crew is-idle">
-      <div class="crew__head"><span>All bots</span><b class="num" id="bot-total">0</b></div>
+      <div class="crew__head"><span>全部機器人</span><b class="num" id="bot-total">0</b></div>
       <div class="crew__grid" id="bot-grid"></div>
       <span class="card__grab" aria-hidden="true"></span>
     </article>

@@ -11,9 +11,9 @@
 
 // English plural forms [one, other].
 const FORMS = {
-  working: ['working', 'working'],
-  attention: ['waiting for you', 'waiting for you'],
-  error: ['error', 'errors'],
+  working: ['工作中', '工作中'],
+  attention: ['等你回覆', '等你回覆'],
+  error: ['錯誤', '錯誤'],
 };
 
 function plural(n, [one, other]) {
@@ -72,6 +72,6 @@ export function renderUI(state) {
   }
   const quiet = working + attention + error === 0;
   show(rest, quiet);
-  if (quiet) set(rest, total ? 'all resting' : 'no bots yet');
+  if (quiet) set(rest, total ? '全部休息中' : '還沒有機器人');
   show(el, true);
 }
