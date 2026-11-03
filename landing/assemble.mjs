@@ -1,8 +1,9 @@
-// Assembles the public Grok Bot Wallpaper site into one folder: the landing page at its root, the live wallpaper at
-// face/ and the 3D office at office/, with their demo data and the assets both load from ../assets/. The same tree
-// goes to GitHub Pages (.github/workflows/pages.yml) and to https://0xcodila.com/grokbot-wallpaper/
-// (rea-home/scripts/deploy.mjs). Only these files go out: no journal, keys, source art, test pages or preview renders.
-// A new file the site needs is added here, once, for both sites.
+// Assembles the public site into one folder. `/` is a tiny page that forwards to the 3D office at
+// office/ and keeps location.search and location.hash (the topic never goes to the server). The live
+// wallpaper is at face/. Both load shared files from ../assets/. The marketing landing (landing/index.html,
+// its fonts, media, icon and og image) is not published. The same tree goes to GitHub Pages
+// (.github/workflows/pages.yml). Only these files go out: no journal, keys, source art, test pages or
+// preview renders. A new file the site needs is added here.
 //   node landing/assemble.mjs <out-dir>
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,10 +12,7 @@ const repo = path.resolve(import.meta.dirname, '..');
 const out = path.resolve(process.argv[2] || '_site');
 const parts = [
   // [from, to, which files, { deep: also its subfolders, optional: may not exist yet }]
-  ['landing', '.', /^(index\.html|icon\.png|og\.png)$/],
-  ['landing/fonts', 'fonts', /\.woff2$/],
-  ['landing/media', 'media', /\.(mp4|jpg)$/],
-  ['.', '.', /^PROMPT\.md$/, { optional: true }],          // the one setup prompt, shown on the landing as it is
+  ['landing', '.', /^office-redirect\.html$/],             // copied, then published as /index.html below
   ['web/face', 'face', /^(index\.html|face\.css|face\.js)$/],
   ['web/data', 'data', /^demo-(state|looks)\.json$/],
   ['lively/dist', 'download', /^grokbot-wallpaper-windows\.zip$/],   // the public Lively package (lively/build-public.ps1)
@@ -49,6 +47,11 @@ function copy(src, dst, keep, deep) {
   return n;
 }
 
+// Drop marketing files a previous assemble may have left at the site root.
+for (const rel of ['icon.png', 'og.png', 'PROMPT.md', 'fonts', 'media']) {
+  fs.rmSync(path.join(out, rel), { recursive: true, force: true });
+}
+
 let total = 0;
 for (const [from, to, keep, { deep = false, optional = false } = {}] of parts) {
   const src = path.join(repo, from);
@@ -56,4 +59,7 @@ for (const [from, to, keep, { deep = false, optional = false } = {}] of parts) {
   if (!n && !optional) throw new Error(`nothing to copy from ${from}/ (expected ${keep})`);
   total += n;
 }
+
+// `/` must be the forwarder, not landing/office-redirect.html and not the marketing page.
+fs.renameSync(path.join(out, 'office-redirect.html'), path.join(out, 'index.html'));
 console.log(`assembled ${total} files into ${out}`);
