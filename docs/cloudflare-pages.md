@@ -15,7 +15,7 @@
 | Output directory | `_site` |
 | 環境變數 | 不必。可選 `NODE_VERSION=20` |
 
-建置只需要 Node，沒有套件安裝步驟。組出來的樹與 GitHub Pages workflow 相同：`/` 是 landing，`/office/` 是 3D 辦公室，`/face/` 是桌布。
+建置只需要 Node，沒有套件安裝步驟。組出來的樹與 GitHub Pages workflow 相同：`/` 轉進 `/office/`（保留 hash 與 query），`/office/` 是 3D 辦公室，`/face/` 是桌布。行銷 landing 不會進 `_site`。
 
 ## 本機預覽
 
@@ -34,10 +34,10 @@ python3 -m http.server 4173 --directory _site
 
 然後打開：
 
-- `http://localhost:4173/` 首頁（繁中）
+- `http://localhost:4173/` 轉進儀表板（`/office/`），query 與 `#gbw-…` 一起留下
 - `http://localhost:4173/office/` 儀表板
 - `http://localhost:4173/face/` 桌布
-- 帶 `#gbw-…` 的首頁應轉到 `office/#gbw-…`（hash 留在瀏覽器，不會送到伺服器）
+- `/#gbw-…` 與 `/office/#gbw-…` 相同（hash 留在瀏覽器，不會送到伺服器）
 
 `_site` 是建置產物，不要提交。
 

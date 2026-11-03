@@ -3,6 +3,9 @@
 node_modules/
 *.log
 
+# assembled site (node landing/assemble.mjs _site)
+/_site/
+
 # local design shots and build intermediates
 mockups/
 __pycache__/

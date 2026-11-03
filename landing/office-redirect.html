@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grok Bot 儀表板</title>
+<script>
+// The topic lives in the hash (older links also put a mailbox in the query). A server
+// redirect never receives the hash, so this page forwards in the browser and keeps both.
+// Search must come before the hash: office/?feed=…#gbw-…
+location.replace('office/' + location.search + location.hash);
+</script>
+</head>
+<body>
+<p><a href="office/">Grok Bot 儀表板</a></p>
+</body>
+</html>
