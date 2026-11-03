@@ -6,6 +6,17 @@ line per step to a journal, a tiny Node server tails it, the browser renders the
 
 Work in progress.
 
+## Cloudflare Pages
+
+This fork’s public site is a static build. Cloudflare Pages settings (account connection and deploy stay a manual step):
+
+- Root directory: `/`
+- Build command: `node landing/assemble.mjs _site`
+- Output directory: `_site`
+- Optional environment variable: `NODE_VERSION=20`
+
+Local preview, the `wrangler pages deploy` alternative, and pausing GitHub Pages are in `docs/cloudflare-pages.md`.
+
 ## Your own bots (no server)
 
 You do not need to run anything to see your own bots. They post their status to a private channel on our relay (`relay.0xcodila.com`, see `relay/`) or, if they were set up with the first prompt, on ntfy.sh. The dashboard reads both and merges them.
