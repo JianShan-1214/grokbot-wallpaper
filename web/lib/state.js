@@ -1,6 +1,9 @@
 // State reducer: journal records -> CONTRACT §4 state. Pure in-memory, clock injectable for tests. Runs in Node (the
 // server) and in the browser (the office reading a bots channel on ntfy.sh), so: no Node-only APIs here.
 import { slugify, hashColor, cleanStr, makeTime, parseTime } from './util.js';
+import { normalizeEvent, EVENT_TYPES, EVENT_KEEP } from './events.js';
+
+const EVENT_TYPE_SET = new Set(EVENT_TYPES);
 
 export const LIMITS = {
   MAX_PER_FLOOR: 20,
@@ -164,6 +167,7 @@ export class StateStore {
     this.members = new Map();    // floor id -> Map(desk -> bot id)
     this.floorSeq = 0;
     this.feed = [];              // newest first
+    this.eventLog = [];          // newest first; optional ntfy event rows (wake/status/step/send/recv/…)
     this.usage = { period: 'week', total: null, resetsMs: null, updatedMs: null, bots: new Map(), routines: {} };
     this.schedules = new Map();  // bot id -> Map(routine -> entry)
     this.floorsCfg = normFloorsCfg(null);
@@ -199,8 +203,35 @@ export class StateStore {
     const type = typeof rec.type === 'string' ? rec.type.toLowerCase() : null;
     if (type === 'usage') return this.applyUsage(rec);
     if (type === 'schedule') return this.applySchedule(rec);
-    if (type && type !== 'activity' && type !== 'event') { this.meta.skipped++; return; }
-    this.applyActivity(rec, replay);
+    // Old clients only know activity/event. The optional event types are the same
+    // status line plus type/peer/summary/ts. Any other type stays skipped.
+    const extended = !!(type && EVENT_TYPE_SET.has(type));
+    if (type && type !== 'activity' && type !== 'event' && !extended) { this.meta.skipped++; return; }
+
+    const ev = normalizeEvent(rec, this.now());
+    const classic = !type || type === 'activity' || type === 'event';
+    const hasStatus = rec.status != null && rec.status !== '';
+    const hasStep = rec.step != null && rec.step !== '';
+    // A typed send/recv that still carries status/step updates the board, so the
+    // old bot/status/step contract holds. Without those fields it is timeline-only
+    // and must not invent a status or a new bot.
+    if (classic || hasStatus || hasStep) {
+      const before = this.meta.events;
+      this.applyActivity(rec, replay);
+      if (ev && this.meta.events !== before) this.rememberEvent(ev);
+      return;
+    }
+    if (ev) this.rememberEvent(ev);
+  }
+
+  rememberEvent(ev) {
+    let ms = ev.ms;
+    const now = this.now();
+    if (!Number.isFinite(ms) || ms > now + 60e3) ms = now;
+    this.eventLog.unshift({ ...ev, ms, id: botIdFor(ev.bot) });
+    if (this.eventLog.length > EVENT_KEEP) this.eventLog.length = EVENT_KEEP;
+    this.dirty = true;
+    this.cache = null;
   }
 
   applyActivity(rec, replay) {
@@ -579,6 +610,15 @@ export class StateStore {
       floors,
       bots,
       feed: this.feed.map((f) => ({ t: iso(f.ms), bot: f.id, name: f.name, status: f.status, step: f.step })),
+      events: this.eventLog.map((e) => ({
+        ts: iso(e.ms),
+        bot: e.bot,
+        id: e.id,
+        type: e.type,
+        ...(e.step ? { step: e.step } : {}),
+        ...(e.peer ? { peer: e.peer } : {}),
+        ...(e.summary ? { summary: e.summary } : {}),
+      })),
       meta: { ...this.meta },
     };
     this.cache = { nowSec: Math.floor(now / 1000), state };

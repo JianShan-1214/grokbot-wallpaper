@@ -14,7 +14,7 @@ const parts = [
   // [from, to, which files, { deep: also its subfolders, optional: may not exist yet }]
   ['landing', '.', /^office-redirect\.html$/],             // copied, then published as /index.html below
   ['web/face', 'face', /^(index\.html|face\.css|face\.js)$/],
-  ['web/data', 'data', /^demo-(state|looks)\.json$/],
+  ['web/data', 'data', /^demo-(state|looks)\.json$|^demo-events\.jsonl$/],
   ['lively/dist', 'download', /^grokbot-wallpaper-windows\.zip$/],   // the public Lively package (lively/build-public.ps1)
   // the 3D office: its page and modules (no *.html test pages), its demo data
   ['web', 'office', /^(index\.html|app\.js|styles\.css|wallpaper\.js|feed\.js)$/],
@@ -23,7 +23,7 @@ const parts = [
   ['web/ui', 'office/ui', /\.(js|css)$/],
   ['web/audio', 'office/audio', /\.(js|m4a)$/],
   ['web/share', 'office/share', /\.(js|css)$/],
-  ['web/data', 'office/data', /^demo-(state|looks)\.json$/],
+  ['web/data', 'office/data', /^demo-(state|looks)\.json$|^demo-events\.jsonl$/],
   // assets, shared by the wallpaper and the office (no preview renders, no office-v1.glb)
   ['assets/face', 'assets/face', /^(sphere(-black)?\.png|eye-.+\.png|eyes\.json|grain\.png)$/],
   ['assets/blobs', 'assets/blobs', /\.glb$/],

@@ -5,3 +5,4 @@ import './server.test.js';
 import './viewkey.test.js';
 import './feedbase.test.js';
 import './board.test.js';
+import './events.test.js';
