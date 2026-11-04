@@ -1,14 +1,17 @@
 // Glue: polls /api/state (CONTRACT §4), keeps the view (floor, selection), feeds the scene and the UI.
 // With #<topic> in the link it reads the user's bots from their channel instead (feed.js, lib/feedbase.js): no server.
 // Without either (static preview) it runs on web/data/demo-state.json with a local simulation.
-import { initScene, renderScene, zoom, focusBot } from './scene/scene.js';
-import { initSound, sfx } from './audio/sound.js';
+// The default page is the dark ops board (ui/board.js). ?mode=wallpaper still builds the 3D office.
 
 const POLL_MS = 1000;
 const view = { currentFloor: null, selectedBot: null };
 let state = null;
 let ui = { initUI() {}, renderUI() {} };
 let demoTimer = null;
+let renderScene = () => {};
+let zoom = () => {};
+let focusBot = () => {};
+const sfx = { hover() {}, select() {}, zoom() {}, floor() {}, status() {} };
 
 // Wallpaper mode (?mode=wallpaper, for Lively): office full screen + one status line, no interaction except hover.
 //   &floor=<id>   pin the floor (default: the floor with the most bots)
@@ -16,17 +19,24 @@ let demoTimer = null;
 const params = new URLSearchParams(location.search);
 const WALLPAPER = params.get('mode') === 'wallpaper';
 if (WALLPAPER) document.documentElement.classList.add('wallpaper');
+else document.documentElement.classList.add('ops');
 
 try {
-  ui = await import(WALLPAPER ? './wallpaper.js' : './ui/ui.js');
+  ui = await import(WALLPAPER ? './wallpaper.js' : './ui/board.js');
 } catch (err) {
   console.warn('[app] UI module not available yet:', err.message);
 }
 
-initScene(document.getElementById('scene'), {
-  onSelectBot: (id) => select(id),
-  onHoverBot: (id) => sfx.hover(id),
-});
+if (WALLPAPER) {
+  const scene = await import('./scene/scene.js');
+  renderScene = scene.renderScene;
+  zoom = scene.zoom;
+  focusBot = scene.focusBot;
+  scene.initScene(document.getElementById('scene'), {
+    onSelectBot: (id) => select(id),
+    onHoverBot: (id) => sfx.hover(id),
+  });
+}
 
 ui.initUI({
   onSelectBot: (id) => select(id),
@@ -34,9 +44,6 @@ ui.initUI({
   onZoom: (dir) => { zoom(dir); sfx.zoom(dir); },
   onOpenChat: (id, url) => { if (url) location.href = url; },
 });
-
-// music and sound effects (not on the wallpaper): the speaker button sits in the top bar's right group
-if (!WALLPAPER) initSound({ slot: document.querySelector('#topbar .bhq-right') });
 
 addEventListener('keydown', (e) => { if (e.key === 'Escape') select(null); });
 
