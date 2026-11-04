@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   STEP_MAX, sortBots, filterBots, attentionBots, truncateStep, kpiCounts, usageTile,
+  chibiPose, partitionBots,
 } from '../../web/ui/board.js';
 
 const bots = [
@@ -50,4 +51,19 @@ test('kpi counts read summary fields and usage tile only when the feed exposes a
   assert.equal(usageTile(null), null);
   assert.equal(usageTile({ period: 'week', total_used_pct: null }), null);
   assert.deepEqual(usageTile({ period: 'week', total_used_pct: 37 }), { label: '本週額度', pct: 37 });
+});
+
+test('fleet keeps idle bots unless a partition says otherwise, and each status has a chibi pose', () => {
+  const all = filterBots(sortBots(bots), 'all');
+  assert.ok(all.some((b) => b.id === 'idle'));
+  assert.equal(partitionBots(all, 'all').length, all.length);
+  const grouped = all.map((b) => ({ ...b, group: b.id === 'idle' ? '休息組' : '值班' }));
+  assert.deepEqual(partitionBots(grouped, '休息組').map((b) => b.id), ['idle']);
+  assert.equal(chibiPose('working'), 'working');
+  assert.equal(chibiPose('idle'), 'idle');
+  assert.equal(chibiPose('waiting_user'), 'waiting');
+  assert.equal(chibiPose('error'), 'error');
+  assert.equal(chibiPose('done'), 'done');
+  assert.equal(chibiPose('stuck'), 'stuck');
+  assert.equal(chibiPose('nope'), 'idle');
 });

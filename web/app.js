@@ -3,6 +3,8 @@
 // Without either (static preview) it runs on web/data/demo-state.json with a local simulation.
 // The default page is the dark ops board (ui/board.js). ?mode=wallpaper still builds the 3D office.
 
+import { normalizeEvent, parseEventJsonl } from './lib/events.js';
+
 const POLL_MS = 1000;
 const view = { currentFloor: null, selectedBot: null };
 let state = null;
@@ -156,6 +158,14 @@ async function startLocalDemo() {
   const res = await fetch('./data/demo-state.json', { cache: 'no-store' });
   state = await res.json();
   state.demoLocal = true;
+  state.eventsSource = 'demo';
+  try {
+    const ev = await fetch('./data/demo-events.jsonl', { cache: 'no-store' });
+    if (!ev.ok) throw new Error(String(ev.status));
+    state.events = parseEventJsonl(await ev.text());
+  } catch {
+    state.events = [];
+  }
   render();
   demoTimer = setInterval(simulate, 1600);
 }
@@ -200,6 +210,12 @@ function simulate() {
   bot.history.length = Math.min(bot.history.length, 20);
   state.feed.unshift({ t: now, bot: bot.id, name: bot.name, status: next, step });
   state.feed.length = Math.min(state.feed.length, 100);
+  const kind = next === 'error' ? 'error' : next === 'done' ? 'done' : (next === 'idle' || next === 'waiting_user') ? 'status' : 'step';
+  const ev = normalizeEvent({ bot: bot.name, status: next, step, type: kind, ts: now, summary: step });
+  if (ev) {
+    ev.id = bot.id;
+    state.events = [ev, ...(state.events || [])].slice(0, 200);
+  }
   recount();
   state.now = now;
   state.version++;

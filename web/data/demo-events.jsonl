@@ -1,0 +1,22 @@
+# DEMO fixture — not a live channel. wake / status / step / send / recv / done / error. No secrets.
+{"bot":"Grok Bot","status":"working","step":"開始看今天的佇列","type":"wake","summary":"喚醒：開始看今天的佇列","ts":"2026-11-04T09:00:00+08:00"}
+{"bot":"Jevopus","status":"idle","step":"佇列空","type":"status","summary":"狀態改為休息","ts":"2026-11-04T09:01:00+08:00"}
+{"bot":"X Writer","status":"working","step":"打開草稿","type":"wake","summary":"喚醒：打開週報草稿","ts":"2026-11-04T09:02:00+08:00"}
+{"bot":"X Writer","status":"working","step":"在寫週報開頭","type":"step","summary":"在寫週報開頭","ts":"2026-11-04T09:06:00+08:00"}
+{"bot":"X Writer","status":"working","step":"在寫週報開頭","type":"send","peer":"Banner & Visuals","summary":"請封面用這組標題","ts":"2026-11-04T09:12:00+08:00"}
+{"bot":"Banner & Visuals","status":"working","step":"在畫封面","type":"recv","peer":"X Writer","summary":"收到標題，開始出圖","ts":"2026-11-04T09:13:00+08:00"}
+{"bot":"Banner & Visuals","status":"working","step":"第二版封面","type":"step","summary":"改第二版封面","ts":"2026-11-04T09:20:00+08:00"}
+{"bot":"X Researcher","status":"waiting_user","step":"等你選要發布的角度","type":"status","summary":"改為等你回覆","ts":"2026-11-04T09:22:00+08:00"}
+{"bot":"Analytics Analyst","status":"error","step":"來源 429，稍後重試","type":"error","summary":"來源 429，稍後重試","ts":"2026-11-04T09:24:00+08:00"}
+{"bot":"Analytics Analyst","status":"error","step":"來源 429，稍後重試","type":"send","peer":"Finance Team","summary":"本週數字先不要用","ts":"2026-11-04T09:25:00+08:00"}
+{"bot":"Finance Team","status":"working","step":"在對帳","type":"recv","peer":"Analytics Analyst","summary":"知道了，先用上次的表","ts":"2026-11-04T09:26:00+08:00"}
+{"bot":"Competitor Watch","status":"done","step":"競品摘要已送出","type":"done","summary":"競品摘要已送出","ts":"2026-11-04T09:30:00+08:00"}
+{"bot":"Bookmarks Brain","status":"working","step":"在收今天的書籤","type":"step","summary":"在收今天的書籤","ts":"2026-11-04T09:33:00+08:00"}
+{"bot":"Ideas Sparring","status":"idle","step":"沒有新題目","type":"status","summary":"休息：沒有新題目","ts":"2026-11-04T09:34:00+08:00"}
+{"bot":"Substack","status":"idle","step":"在等下一篇","type":"status","summary":"休息：在等下一篇","ts":"2026-11-04T09:35:00+08:00"}
+{"bot":"Trendy X","status":"working","step":"在掃高觸及","type":"wake","summary":"喚醒：在掃高觸及","ts":"2026-11-04T09:36:00+08:00"}
+{"bot":"Warren Buffett","status":"idle","step":"在等行情摘要","type":"status","summary":"休息：在等行情摘要","ts":"2026-11-04T09:37:00+08:00"}
+{"bot":"X Ads Manager","status":"waiting_user","step":"等你確認預算","type":"status","summary":"等你確認預算","ts":"2026-11-04T09:40:00+08:00"}
+{"bot":"Finance Team","status":"working","step":"在對本週支出","type":"step","summary":"在對本週支出","ts":"2026-11-04T09:42:00+08:00"}
+{"bot":"QT Scout","status":"working","step":"研究做到一半","type":"step","summary":"研究做到一半","ts":"2026-11-04T09:44:00+08:00"}
+{"bot":"Grok Bot","status":"working","step":"在排今天的順序","summary":"舊格式：只有 bot、status、step","ts":"2026-11-04T09:48:00+08:00"}
