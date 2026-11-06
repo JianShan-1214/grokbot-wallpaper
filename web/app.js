@@ -141,10 +141,11 @@ async function poll() {
 
 // ---------- the user's own bots: #<topic> ----------
 
-const { feedFromLink } = await import('./lib/feedbase.js');
+const { feedFromLink, cfBusFromLink } = await import('./lib/feedbase.js');
 if (feedFromLink(location)) {                              // #<topic>, #<topic>@<host>, ?feed=<host>#<topic>
   const { feedFromHash, connectFeed } = await import('./feed.js');
-  connectFeed(feedFromHash(location.hash, location.search), (data) => { state = data; render(); });
+  // cf is null unless ?cf=<origin> or CF_FEED_ENABLED. ntfy + relay stay the default readers.
+  connectFeed({ ...feedFromHash(location.hash, location.search), cf: cfBusFromLink(location) }, (data) => { state = data; render(); });
   addEventListener('hashchange', () => location.reload());   // another channel: start over
 } else {
   poll();

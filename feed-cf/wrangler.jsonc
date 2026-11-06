@@ -1,0 +1,31 @@
+// Free-plan status bus for the office board. Do not add routes, custom domains, Durable Objects,
+// or a ratelimit binding here: this file must stay deployable on Workers Free without DNS changes.
+// PUBLISH_TOKEN is a secret (`wrangler secret put PUBLISH_TOKEN`), never a var. Replace database_id
+// after a human runs `wrangler d1 create grokbot-feed-cf`. The zero UUID is a local placeholder only;
+// this repo does not create or attach a remote database.
+{
+  "name": "grokbot-feed-cf",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-06",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 1 }
+  },
+  "vars": {
+    "DAILY_PUBLISH_BUDGET": "2000",
+    "RETAIN_SECONDS": "43200",
+    "KEEP_LINES": "600",
+    "POLL_SECONDS": "15"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "grokbot-feed-cf",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

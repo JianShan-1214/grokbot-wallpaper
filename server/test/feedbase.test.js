@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FEED_BASE, feedBase, feedFromLink, baseTag } from '../../web/lib/feedbase.js';
+import { FEED_BASE, CF_FEED_BASE, CF_FEED_ENABLED, feedBase, feedFromLink, baseTag, cfBusFromLink, parseFeedSse } from '../../web/lib/feedbase.js';
 import { StateStore } from '../state.js';
 
 const root = new URL('../../', import.meta.url);
@@ -26,6 +26,25 @@ test('feed links: one default base, @host, ?feed=, the older &ntfy=', () => {
 // step 1 of a prompt prints FEED = <base> + topic, built from string pieces so it has no link
 const feedPrinted = (md) => [...md.matchAll(/print\(((?:'[^']*'\+)+)t\)/g)].map((m) => [...m[1].matchAll(/'([^']*)'/g)].map((x) => x[1]).join(''))[0];
 const statusRule = (md) => md.split('\n').find((l) => l.startsWith('STATUS RULE, '));
+
+test('cloudflare bus stays off until a human points ?cf= at it', () => {
+  assert.equal(CF_FEED_ENABLED, false);
+  assert.equal(CF_FEED_BASE, '');
+  assert.equal(cfBusFromLink({ hash: '#gbw-abcdef123' }), null);
+  assert.equal(cfBusFromLink({ hash: '#gbw-abcdef123', search: '?cf=0' }), null);
+  assert.equal(cfBusFromLink({ hash: '#gbw-abcdef123', search: '?cf=1' }), null);
+  assert.equal(cfBusFromLink({ hash: '#gbw-abcdef123', search: '?cf=http://evil.example' }), null);
+  assert.deepEqual(cfBusFromLink({ hash: '#gbw-abcdef123', search: '?cf=http://127.0.0.1:8787' }), {
+    topic: 'gbw-abcdef123', base: 'http://127.0.0.1:8787', pollMs: 15000,
+  });
+  assert.equal(cfBusFromLink({ hash: '#gbw-abcdef123', search: '?cf=https://feed.example.com/bus/' }).base, 'https://feed.example.com/bus');
+  assert.equal(/const CF_FEED_BASE = ''/.test(read('web/face/face.js')), true);
+  assert.equal(/const CF_FEED_ENABLED = false/.test(read('web/face/face.js')), true);
+  const sse = parseFeedSse('retry: 15000\n\nid: 7\ndata: {"id":"7","event":"message","message":"{}"}\n\n: idle\n\n');
+  assert.equal(sse.retry, 15000);
+  assert.equal(sse.cursor, '7');
+  assert.equal(sse.messages.length, 1);
+});
 
 test('prompts: the posted one feeds ntfy.sh (FEED_BASE), the current one our relay with the status rule', () => {
   assert.equal(feedPrinted(read('PROMPT.md')), FEED_BASE, 'PROMPT.md (the posted prompt) prints FEED_BASE + topic');

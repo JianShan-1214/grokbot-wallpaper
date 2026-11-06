@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "id": "1",
+  "time": 1793944041,
+  "topic": "gbw-cfstage01",
+  "event": "message",
+  "message": "{\"bot\":\"CF Writer\",\"status\":\"working\",\"step\":\"免費匯流排測試\"}"
+}

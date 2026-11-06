@@ -1,0 +1,24 @@
+{
+  "topic": "gbw-cfstage01",
+  "cursor": "1",
+  "as_of": 1793944041,
+  "bots": [
+    {
+      "seq": 1,
+      "time": 1793944041,
+      "message": "{\"bot\":\"CF Writer\",\"status\":\"working\",\"step\":\"免費匯流排測試\"}",
+      "bot": "CF Writer",
+      "status": "working",
+      "step": "免費匯流排測試"
+    }
+  ],
+  "meta": {
+    "roster": null,
+    "looks": null,
+    "groups": null,
+    "chat": null,
+    "usage": null,
+    "check": null,
+    "routines": []
+  }
+}

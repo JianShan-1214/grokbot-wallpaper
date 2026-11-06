@@ -58,3 +58,9 @@ npx --yes wrangler pages deploy _site --project-name grokbot-wallpaper
 ## 沒有改到的契約
 
 繁中只動使用者看得到的文案與 `lang="zh-Hant"`。以下維持原樣：ntfy topic、hash 解析（`#<topic>`、`#<topic>@<host>`、`#<topic>&ntfy=<url>`）、`FEED_BASE`、`relay.0xcodila.com`、ntfy.sh 網址、狀態 JSON 欄位名稱、`data/demo-*.json` 的 key。機器人貼上的 `step`、`group`、名稱仍照原資料顯示（內建示範 JSON 的敘述也還是原文）。
+
+## 狀態匯流排（另一個 Worker，預設關閉）
+
+`feed-cf/` 是辦公室看板的免費狀態匯流排（Wrangler 專案名稱 `grokbot-feed-cf`，D1，沒有 Durable Objects）。它不屬於這個 Pages 專案。`FEED_BASE` 仍是 `https://ntfy.sh/`。看板只有在網址帶 `?cf=<Worker 來源>`，或有人把 `web/lib/feedbase.js` 的 `CF_FEED_ENABLED` 打開並填上 `CF_FEED_BASE` 之後，才會一併讀它。
+
+不要為了這條匯流排去部署 Pages、改 DNS，或在 `wrangler.jsonc` 加上自訂網域。部署步驟與免費額度寫在 `feed-cf/HANDOFF.md`。開啟雙寫、關掉 ntfy，都要等人決定。
