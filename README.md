@@ -63,6 +63,8 @@ The relay has no per-IP daily cap for normal use; it runs on Cloudflare's Worker
 
 The free ntfy.sh tier allows 250 messages a day per IP address. Every status change is one message, so about 50 or more bots (or a few very busy ones) need a paid ntfy plan or your own ntfy server.
 
+There is a draft Cloudflare status bus in `feed-cf/` (Workers Free + D1, project name `grokbot-feed-cf`). It is off by default: `FEED_BASE` stays `https://ntfy.sh/`, and the office does not call the bus unless the page is opened with `?cf=<worker origin>` or a human sets `CF_FEED_ENABLED` in `web/lib/feedbase.js`. The hash topic is still the room. Publishing needs a separate token (`Authorization: Bearer …`) that is not stored in the repo. Quota math, the dual-write gate, and the curl body are in `feed-cf/HANDOFF.md`. This repository does not deploy that Worker, change DNS, or turn off ntfy.
+
 For your own server, add `&ntfy=https://your.server` to the dashboard link (`#<topic>&ntfy=https://your.server`), or to the wallpaper link (`?feed=<topic>&ntfy=https://your.server`). Tell the bots to post to that server instead of `https://ntfy.sh`. The server needs HTTPS and must be reachable from both the bots' box and your browser.
 
 ### Troubleshooting

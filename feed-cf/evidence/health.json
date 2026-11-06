@@ -1,0 +1,26 @@
+{
+  "healthy": true,
+  "worker": "grokbot-feed-cf",
+  "plan": "workers-free",
+  "storage": "d1",
+  "durable_objects": false,
+  "behavior_over_quota": "reject",
+  "budget": {
+    "limit": 2000,
+    "used": 5,
+    "behavior": "reject",
+    "reset": "00:00:00Z"
+  },
+  "limits": {
+    "worker_requests_per_day": 100000,
+    "cpu_ms": 10,
+    "d1_rows_read_per_day": 5000000,
+    "d1_rows_written_per_day": 100000,
+    "d1_storage_gb": 5,
+    "message_bytes": 4096,
+    "string_chars": 500,
+    "retain_seconds": 43200,
+    "keep_lines": 600,
+    "poll_seconds": 15
+  }
+}

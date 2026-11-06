@@ -625,6 +625,9 @@ window.livelyPropertyListener = (name, value) => {
 // channel with plain curl; nothing else runs on the bots' box. The page reads the last 12 hours, then listens live.
 // The mailbox is FEED_BASE unless the link names another: #<channel>@<host>, ?feed=<host> or &ntfy=<https server>.
 const FEED_BASE = 'https://ntfy.sh/';                    // = FEED_BASE in office/lib/feedbase.js (a test keeps them equal)
+const CF_FEED_BASE = '';                                 // = CF_FEED_BASE in lib/feedbase.js; empty until a human sets the Worker origin
+const CF_FEED_ENABLED = false;                           // = CF_FEED_ENABLED; ?cf=<origin> opts this browser in, ?cf=0 forces off
+const CF_POLL_MS = 15000;
 const RELAY = 'https://relay.0xcodila.com';              // our relay: bots set up with the current prompt post there
 const stored = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
 const HASH = /^#([A-Za-z0-9_-]{6,64})(?:@([^&#]+)|&ntfy=([^&]+))?$/.exec(location.hash);
@@ -699,6 +702,20 @@ function settleQuiet() {                                 // a finished task rest
   }
   return changed;
 }
+function cfOriginFromPage() {
+  const flag = params.get('cf');
+  if (flag === '0' || flag === 'off' || flag === 'false') return null;
+  let raw = null;
+  if (flag && flag !== '1' && flag !== 'on' && flag !== 'true') raw = flag;
+  else if (flag === '1' || flag === 'on' || flag === 'true' || CF_FEED_ENABLED) raw = CF_FEED_BASE;
+  if (!raw) return null;
+  try {
+    const u = new URL(/^[a-z]+:\/\//i.test(raw) ? raw : `https://${raw}`);
+    if (u.protocol !== 'https:' && !(u.protocol === 'http:' && /^(localhost|127\.0\.0\.1)$/.test(u.hostname))) return null;
+    return (u.origin + u.pathname).replace(/\/+$/, '');
+  } catch { return null; }
+}
+
 async function connectFeed() {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(MEMORY_KEY)) || {}; } catch { /* nothing remembered yet */ }
@@ -708,12 +725,25 @@ async function connectFeed() {
   // the usual mailbox (ntfy.sh) means "read both", like the office: bots on the first prompt post to ntfy.sh, bots on
   // the current one to our relay; a link that names another server reads only that one
   const boxes = (NTFY === FEED_BASE.replace(/\/$/, '') ? [RELAY, NTFY] : [NTFY]).map((s) => `${s}/${encodeURIComponent(FEED)}`);
+  const cfOrigin = cfOriginFromPage();
   const seen = new Set();
-  const fresh = (m) => { const k = `${m.time} ${m.message}`; return !seen.has(k) && !!seen.add(k); };   // a line in both boxes counts once
+  const recentBody = new Map();
+  const fresh = (m) => {
+    const k = `${m.time} ${m.message}`;
+    if (seen.has(k)) return false;
+    if (cfOrigin) {
+      const prev = recentBody.get(m.message);
+      const at = Number(m.time) || 0;
+      if (prev != null && Math.abs(at - prev) <= 180) return false;
+      recentBody.set(m.message, at);
+    }
+    seen.add(k);
+    return true;
+  };
   const rows = [];
   await Promise.all(boxes.map(async (base) => {
     try {
-      const text = await (await fetch(`${base}/json?poll=1&since=12h`, { cache: 'no-store' })).text();
+      const text = await (await fetch(`${base}/json?poll=1&since=12h`, { cache: 'no-store', signal: AbortSignal.timeout(8000) })).text();
       for (const line of text.split('\n')) {
         if (!line) continue;
         const m = JSON.parse(line);
@@ -721,6 +751,26 @@ async function connectFeed() {
       }
     } catch { /* offline or down: the other box and what is remembered still show the bots */ }
   }));
+  let cfCursor = '0';
+  if (cfOrigin) {
+    try {
+      const res = await fetch(`${cfOrigin}/events?topic=${encodeURIComponent(FEED)}&since=12h`, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const data = await res.json();
+        for (const m of data.events || []) if (m?.event === 'message') rows.push(m);
+        if (data.cursor) cfCursor = String(data.cursor);
+      }
+    } catch { /* the bus is optional; ntfy and the relay still paint the wallpaper */ }
+    try {
+      const res = await fetch(`${cfOrigin}/snapshot?topic=${encodeURIComponent(FEED)}`, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const data = await res.json();
+        const push = (row) => { if (row?.message) rows.push({ id: String(row.seq ?? ''), time: row.time, event: 'message', message: row.message }); };
+        for (const row of data.bots || []) push(row);
+        for (const key of ['roster', 'looks', 'usage']) push(data.meta?.[key]);
+      }
+    } catch { /* snapshot is a fallback when the event log was pruned */ }
+  }
   rows.sort((a, b) => a.time - b.time);
   for (const m of rows) if (fresh(m)) applyLine(m.message, m.time);
   settleQuiet();
@@ -743,6 +793,20 @@ async function connectFeed() {
       ws.onmessage = (e) => { heard = Date.now(); if (e.data !== 'pong') take(e.data); };
       ws.onclose = () => { clearInterval(ping); setTimeout(open, wait); wait = Math.min(wait * 2, 60e3); };
     })();
+  }
+  if (cfOrigin) {
+    const pullCf = async () => {
+      try {
+        const res = await fetch(`${cfOrigin}/events?topic=${encodeURIComponent(FEED)}&since=${encodeURIComponent(cfCursor)}`, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+        if (!res.ok) return;
+        const data = await res.json();
+        let changed = false;
+        for (const m of data.events || []) if (m?.event === 'message' && fresh(m) && applyLine(m.message, m.time)) changed = true;
+        if (data.cursor) cfCursor = String(data.cursor);
+        if (changed) { remember(); render(state); }
+      } catch { /* next tick retries */ }
+    };
+    setInterval(pullCf, CF_POLL_MS);
   }
   setInterval(() => { if (settleQuiet()) { remember(); render(state); } }, 60e3);
 }

@@ -1,0 +1,13 @@
+{
+  "name": "grokbot-feed-cf",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "node --test test/bus.test.mjs",
+    "types": "wrangler types --include-runtime false"
+  },
+  "devDependencies": {
+    "wrangler": "^4.46.0"
+  }
+}

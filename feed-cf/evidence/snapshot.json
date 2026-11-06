@@ -1,0 +1,43 @@
+{
+  "topic": "gbw-evidence01",
+  "cursor": "5",
+  "as_of": 1793944200,
+  "bots": [
+    {
+      "seq": 5,
+      "time": 1793944200,
+      "message": "{\"bot\":\"CF Writer\",\"status\":\"working\",\"step\":\"仍保留舊欄位\",\"type\":\"status\",\"peer\":\"Quiet Bot\",\"summary\":\"短句\",\"ts\":\"2026-11-06T05:00:00+08:00\"}",
+      "bot": "CF Writer",
+      "status": "working",
+      "step": "仍保留舊欄位",
+      "type": "status",
+      "peer": "Quiet Bot",
+      "summary": "短句",
+      "ts": "2026-11-06T05:00:00+08:00"
+    }
+  ],
+  "meta": {
+    "roster": {
+      "seq": 2,
+      "time": 1793944200,
+      "message": "{\"roster\":[\"CF Writer\",\"Quiet Bot\"]}"
+    },
+    "looks": null,
+    "groups": null,
+    "chat": null,
+    "usage": {
+      "seq": 3,
+      "time": 1793944200,
+      "message": "{\"type\":\"usage\",\"total_used_pct\":37,\"resets_at\":\"2026-11-08T00:00:00+08:00\",\"bots\":{\"CF Writer\":4.1}}",
+      "type": "usage"
+    },
+    "check": null,
+    "routines": [
+      {
+        "seq": 4,
+        "time": 1793944200,
+        "message": "{\"routines\":{\"bot\":\"CF Writer\",\"items\":[{\"name\":\"Morning\",\"schedule\":\"daily 09:00\",\"next_run\":\"2026-11-07T09:00:00+08:00\"}]}}"
+      }
+    ]
+  }
+}

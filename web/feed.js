@@ -8,6 +8,10 @@
 // empty, every bot is still there, resting. A `working` bot that stays silent for 20 minutes counts as idle (it forgot
 // its closing line).
 //
+// Cloudflare bus (feed-cf/): optional third reader. Off unless cfBusFromLink says so (`?cf=<origin>` or the
+// CF_FEED_ENABLED flag). It does not replace ntfy until a human turns that flag on. While it is on, the same JSON
+// posted to ntfy and to the bus within 3 minutes counts once.
+//
 // Lines on the channel (one JSON object per message, at most 4 KB, anything else is dropped):
 //   {"bot":"…","status":"working|idle|waiting_user|error|done","step":"…"}     a status change
 //   {"roster":["Bot A","Bot B"]}                                                every bot appears, idle until it posts
@@ -21,10 +25,11 @@
 // state.routines (every bot's routines, soonest first) and state.check (the latest status check: who has answered), for
 // the «Finished», «Routines» and «Status check» panels.
 import { StateStore, botIdFor } from './lib/state.js';
-import { FEED_BASE, feedFromLink } from './lib/feedbase.js';
+import { FEED_BASE, feedFromLink, parseFeedSse } from './lib/feedbase.js';
 
 const RELAY = 'https://relay.0xcodila.com', NTFY = 'https://ntfy.sh';
 const MAX_LINE = 4096, KEEP = 600, TICK_MS = 30e3, DAY_MS = 24 * 3600e3, PING_MS = 60e3;
+const MAILBOX_TIMEOUT_MS = 8000, DUAL_WRITE_SKEW_S = 180;
 const QUIET_MS = 20 * 60e3, CHECK_MS = 6 * 3600e3;    // a silent worker turns idle; a status check stays up this long
 // Everyone's bots, ours included, are built from their look (the app's 14 avatars and 11 colours, read from a
 // screenshot), so a bot in the office is the bot in the app. The hand-made GLBs in assets/blobs/ stay for the local server.
@@ -38,8 +43,41 @@ export function feedFromHash(hash, search = '') {
   return { topic: f.topic, servers: f.base === FEED_BASE ? [RELAY, NTFY] : [f.base.replace(/\/$/, '')] };
 }
 
-/** Rebuild from cache + each mailbox's last 12 h, then follow them live. Calls onState(state) on every change. */
-export async function connectFeed({ topic, servers }, onState) {
+/** History from the Cloudflare bus: event log, then snapshot rows the log has already dropped. */
+export async function loadCfLines(base, topic) {
+  const lines = [];
+  const opts = { cache: 'no-store', signal: AbortSignal.timeout(MAILBOX_TIMEOUT_MS) };
+  const push = (id, time, message) => {
+    if (typeof message !== 'string' || typeof id !== 'string') return;
+    lines.push({ id, time: Number(time) || 0, message, src: 'cf' });
+  };
+  try {
+    const res = await fetch(`${base}/events?topic=${encodeURIComponent(topic)}&since=12h`, opts);
+    if (res.ok) {
+      const data = await res.json();
+      for (const m of data.events || []) if (m?.event === 'message') push(String(m.id), m.time, m.message);
+    }
+  } catch { /* bus down: snapshot may still have the latest status */ }
+  try {
+    const res = await fetch(`${base}/snapshot?topic=${encodeURIComponent(topic)}`, opts);
+    if (res.ok) {
+      const data = await res.json();
+      for (const row of data.bots || []) push(String(row.seq ?? row.id ?? ''), row.time, row.message);
+      const meta = data.meta || {};
+      for (const key of ['roster', 'looks', 'groups', 'chat', 'usage', 'check']) {
+        const row = meta[key];
+        if (row) push(String(row.seq ?? ''), row.time, row.message);
+      }
+      for (const row of meta.routines || []) push(String(row.seq ?? ''), row.time, row.message);
+    }
+  } catch { /* snapshot is optional when the event log answered */ }
+  const cursor = lines.reduce((max, line) => (/^\d+$/.test(line.id) ? Math.max(max, Number(line.id)) : max), 0);
+  return { lines, cursor: String(cursor) };
+}
+
+/** Rebuild from cache + each mailbox's last 12 h, then follow them live. Calls onState(state) on every change.
+ *  `cf` ({ base, pollMs }) is the optional Cloudflare bus from cfBusFromLink. */
+export async function connectFeed({ topic, servers, cf = null }, onState) {
   const sources = servers.map((server) => ({ server, tag: server.startsWith(RELAY) ? 'relay' : 'ntfy', base: `${server}/${encodeURIComponent(topic)}`, lastId: null }));
   const usual = servers.length > 1;                      // the plain link: both mailboxes, one cache
   const cacheKey = usual ? `bothq.feed.${topic}` : `bothq.feed.${servers[0]}.${topic}`;
@@ -51,15 +89,22 @@ export async function connectFeed({ topic, servers }, onState) {
   let check = null;                                      // the latest status check: { ms, names }
   let lines = [], saveTimer = 0;
   const seen = new Set();
+  const recentBody = new Map();
 
-  lines = cached(cacheKey).map((l) => ({ ...l, src: l.src || sources[0].tag }));
+  lines = cached(cacheKey).map((l) => ({ ...l, src: l.src || sources[0]?.tag || 'cf' }));
   if (usual) lines.push(...cached(oldKey).map((l) => ({ ...l, src: l.src || 'ntfy' })));
   await Promise.all(sources.map(async (s) => {
     try {
-      const text = await (await fetch(`${s.base}/json?poll=1&since=12h`, { cache: 'no-store' })).text();
+      const text = await (await fetch(`${s.base}/json?poll=1&since=12h`, { cache: 'no-store', signal: AbortSignal.timeout(MAILBOX_TIMEOUT_MS) })).text();
       for (const row of text.split('\n')) if (row) keep(s, JSON.parse(row));
     } catch { /* offline or down: the other mailbox and the cache still show the office */ }
   }));
+  let cfCursor = '0';
+  if (cf?.base) {
+    const got = await loadCfLines(cf.base, topic);
+    lines.push(...got.lines);
+    cfCursor = got.cursor;
+  }
   lines = lines.filter(fresh).sort((a, b) => a.time - b.time);   // stable: lines of one second keep the mailbox's order
   for (const l of lines) ingest(l, true);
   for (const s of sources) s.lastId = lines.findLast((l) => l.src === s.tag)?.id ?? null;
@@ -72,7 +117,9 @@ export async function connectFeed({ topic, servers }, onState) {
       chat: bots.some((c) => c.chat_url), teams: bots.some((c) => c.floor) } });
 
   for (const s of sources) follow(s);
-  setInterval(() => { const v = store.version, s = store.snapshot(); if (store.version !== v) onState(extras(s)); }, TICK_MS);
+  const stopCf = cf?.base ? followCf(cf, cfCursor) : () => {};
+  const quietTimer = setInterval(() => { const v = store.version, s = store.snapshot(); if (store.version !== v) onState(extras(s)); }, TICK_MS);
+  return () => { stopCf(); clearInterval(quietTimer); };
 
   function cached(key) {
     try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; }
@@ -80,6 +127,12 @@ export async function connectFeed({ topic, servers }, onState) {
   function fresh(l) {                                    // once per mailbox id, and once per (time, text) across mailboxes
     const a = `${l.src} ${l.id}`, b = `${l.time} ${l.message}`;
     if (seen.has(a) || seen.has(b)) return false;
+    if (cf?.base) {                                      // the same JSON on ntfy and the bus, a few minutes apart, counts once
+      const prev = recentBody.get(l.message);
+      const at = Number(l.time) || 0;
+      if (prev != null && Math.abs(at - prev) <= DUAL_WRITE_SKEW_S) return false;
+      recentBody.set(l.message, at);
+    }
     seen.add(a).add(b);
     return true;
   }
@@ -117,9 +170,36 @@ export async function connectFeed({ topic, servers }, onState) {
       ws.onclose = () => { clearInterval(ping); setTimeout(open, wait); wait = Math.min(wait * 2, 60e3); };
     })();
   }
+  function followCf(bus, cursor) {
+    const source = { tag: 'cf', lastId: cursor };
+    let since = cursor;
+    let wait = bus.pollMs || 15000;
+    let timer = 0;
+    const tick = async () => {
+      try {
+        const res = await fetch(`${bus.base}/events?topic=${encodeURIComponent(topic)}&since=${encodeURIComponent(since)}&stream=sse`, {
+          cache: 'no-store',
+          headers: { Accept: 'text/event-stream' },
+          signal: AbortSignal.timeout(MAILBOX_TIMEOUT_MS),
+        });
+        if (!res.ok) wait = Math.min(Math.max(wait, 15000) * 2, 60e3);
+        else {
+          const parsed = parseFeedSse(await res.text());
+          if (parsed.retry >= 1000) wait = parsed.retry;
+          let changed = false;
+          for (const m of parsed.messages) if (take(source, m)) changed = true;
+          if (parsed.cursor) since = parsed.cursor;
+          if (changed) publish();
+        }
+      } catch { wait = Math.min(Math.max(wait, 15000) * 2, 60e3); }
+      timer = setTimeout(tick, wait);
+    };
+    timer = setTimeout(tick, wait);
+    return () => clearTimeout(timer);
+  }
   async function catchUp(s) {
     try {
-      const text = await (await fetch(`${s.base}/json?poll=1&since=${s.lastId ?? '12h'}`, { cache: 'no-store' })).text();
+      const text = await (await fetch(`${s.base}/json?poll=1&since=${s.lastId ?? '12h'}`, { cache: 'no-store', signal: AbortSignal.timeout(MAILBOX_TIMEOUT_MS) })).text();
       let changed = false;
       for (const row of text.split('\n')) if (row && take(s, JSON.parse(row))) changed = true;
       if (changed) publish();
